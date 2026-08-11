@@ -1,0 +1,695 @@
+[
+  {
+    "id": "ecommerce_handmade",
+    "description": "An e-commerce platform for handmade crafts with seller storefronts, product listings, shopping cart, payment processing, order tracking, and review system",
+    "features": ["product_listing", "payments", "seller_dashboard", "user_auth", "shopping_cart", "reviews", "order_tracking"],
+    "architecture": {
+      "components": [
+        {"id": "web_frontend", "name": "Web Frontend", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Authentication Service", "type": "backend"},
+        {"id": "product_service", "name": "Product Service", "type": "backend"},
+        {"id": "cart_service", "name": "Cart Service", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "order_service", "name": "Order Service", "type": "backend"},
+        {"id": "review_service", "name": "Review Service", "type": "backend"},
+        {"id": "seller_portal", "name": "Seller Dashboard", "type": "frontend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_frontend", "to": "api_gateway", "label": "REST API"},
+        {"from": "seller_portal", "to": "api_gateway", "label": "REST API"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth check"},
+        {"from": "api_gateway", "to": "product_service", "label": "CRUD"},
+        {"from": "api_gateway", "to": "cart_service", "label": "Cart ops"},
+        {"from": "cart_service", "to": "payment_gateway", "label": "Checkout"},
+        {"from": "payment_gateway", "to": "order_service", "label": "Order creation"},
+        {"from": "order_service", "to": "notification_service", "label": "Status updates"},
+        {"from": "product_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "product_service", "to": "media_storage", "label": "Image upload"},
+        {"from": "review_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "healthcare_telemedicine",
+    "description": "A telemedicine platform with video consultations, appointment scheduling, electronic health records, prescription management, and patient portal",
+    "features": ["video_call", "appointments", "health_records", "prescriptions", "user_auth", "notifications", "admin_dashboard"],
+    "architecture": {
+      "components": [
+        {"id": "patient_app", "name": "Patient App", "type": "frontend"},
+        {"id": "doctor_portal", "name": "Doctor Portal", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "appointment_service", "name": "Appointment Service", "type": "backend"},
+        {"id": "video_service", "name": "Video Conferencing", "type": "integration"},
+        {"id": "ehr_service", "name": "EHR Service", "type": "backend"},
+        {"id": "prescription_service", "name": "Prescription Service", "type": "backend"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "file_storage", "name": "Document Storage", "type": "storage"},
+        {"id": "admin_panel", "name": "Admin Dashboard", "type": "frontend"}
+      ],
+      "connections": [
+        {"from": "patient_app", "to": "api_server", "label": "REST API"},
+        {"from": "doctor_portal", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "appointment_service", "label": "Scheduling"},
+        {"from": "appointment_service", "to": "video_service", "label": "Start call"},
+        {"from": "api_server", "to": "ehr_service", "label": "Records"},
+        {"from": "ehr_service", "to": "file_storage", "label": "Documents"},
+        {"from": "api_server", "to": "prescription_service", "label": "Rx management"},
+        {"from": "appointment_service", "to": "notification_service", "label": "Reminders"},
+        {"from": "ehr_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "admin_panel", "to": "api_server", "label": "Admin API"}
+      ]
+    }
+  },
+  {
+    "id": "social_platform",
+    "description": "A social networking platform with user profiles, posts, comments, real-time chat, friend connections, news feed, and content moderation",
+    "features": ["user_profiles", "posts", "comments", "chat", "real_time", "news_feed", "content_moderation", "user_auth"],
+    "architecture": {
+      "components": [
+        {"id": "web_app", "name": "Web Application", "type": "frontend"},
+        {"id": "mobile_app", "name": "Mobile App", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "user_service", "name": "User Service", "type": "backend"},
+        {"id": "post_service", "name": "Post Service", "type": "backend"},
+        {"id": "feed_service", "name": "Feed Service", "type": "backend"},
+        {"id": "chat_service", "name": "Chat Service", "type": "backend"},
+        {"id": "websocket_server", "name": "WebSocket Server", "type": "backend"},
+        {"id": "moderation_service", "name": "Content Moderation", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "cache", "name": "Redis Cache", "type": "cache"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"},
+        {"id": "search_engine", "name": "Search Engine", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_app", "to": "api_gateway", "label": "REST/WebSocket"},
+        {"from": "mobile_app", "to": "api_gateway", "label": "REST/WebSocket"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth"},
+        {"from": "api_gateway", "to": "user_service", "label": "Profiles"},
+        {"from": "api_gateway", "to": "post_service", "label": "Posts"},
+        {"from": "post_service", "to": "feed_service", "label": "Feed update"},
+        {"from": "api_gateway", "to": "chat_service", "label": "Messages"},
+        {"from": "chat_service", "to": "websocket_server", "label": "Real-time"},
+        {"from": "post_service", "to": "moderation_service", "label": "Content check"},
+        {"from": "feed_service", "to": "cache", "label": "Cached feeds"},
+        {"from": "post_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "post_service", "to": "media_storage", "label": "Media upload"},
+        {"from": "user_service", "to": "search_engine", "label": "Index users"}
+      ]
+    }
+  },
+  {
+    "id": "booking_system",
+    "description": "A hotel and travel booking system with property listings, availability calendar, reservation management, payments, and guest reviews",
+    "features": ["property_listing", "calendar", "reservations", "payments", "reviews", "search", "user_auth", "notifications"],
+    "architecture": {
+      "components": [
+        {"id": "booking_frontend", "name": "Booking Website", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "listing_service", "name": "Listing Service", "type": "backend"},
+        {"id": "search_service", "name": "Search Service", "type": "backend"},
+        {"id": "availability_service", "name": "Availability Service", "type": "backend"},
+        {"id": "reservation_service", "name": "Reservation Service", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "review_service", "name": "Review Service", "type": "backend"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"}
+      ],
+      "connections": [
+        {"from": "booking_frontend", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "search_service", "label": "Search"},
+        {"from": "search_service", "to": "listing_service", "label": "Listings"},
+        {"from": "api_server", "to": "availability_service", "label": "Calendar"},
+        {"from": "availability_service", "to": "reservation_service", "label": "Book"},
+        {"from": "reservation_service", "to": "payment_gateway", "label": "Payment"},
+        {"from": "reservation_service", "to": "notification_service", "label": "Confirmation"},
+        {"from": "listing_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "listing_service", "to": "media_storage", "label": "Photos"}
+      ]
+    }
+  },
+  {
+    "id": "learning_platform",
+    "description": "An online learning platform with course management, video lessons, quizzes, progress tracking, certificates, and discussion forums",
+    "features": ["courses", "video_streaming", "quizzes", "progress_tracking", "certificates", "discussions", "user_auth", "payments"],
+    "architecture": {
+      "components": [
+        {"id": "student_portal", "name": "Student Portal", "type": "frontend"},
+        {"id": "instructor_portal", "name": "Instructor Portal", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "course_service", "name": "Course Service", "type": "backend"},
+        {"id": "video_service", "name": "Video Streaming", "type": "integration"},
+        {"id": "quiz_service", "name": "Quiz Engine", "type": "backend"},
+        {"id": "progress_service", "name": "Progress Tracker", "type": "backend"},
+        {"id": "certificate_service", "name": "Certificate Generator", "type": "backend"},
+        {"id": "forum_service", "name": "Forum Service", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"}
+      ],
+      "connections": [
+        {"from": "student_portal", "to": "api_server", "label": "REST API"},
+        {"from": "instructor_portal", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "course_service", "label": "Courses"},
+        {"from": "course_service", "to": "video_service", "label": "Streaming"},
+        {"from": "api_server", "to": "quiz_service", "label": "Assessments"},
+        {"from": "quiz_service", "to": "progress_service", "label": "Score update"},
+        {"from": "progress_service", "to": "certificate_service", "label": "Completion"},
+        {"from": "api_server", "to": "forum_service", "label": "Discussions"},
+        {"from": "api_server", "to": "payment_gateway", "label": "Enrollment"},
+        {"from": "course_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "course_service", "to": "media_storage", "label": "Content"}
+      ]
+    }
+  },
+  {
+    "id": "iot_dashboard",
+    "description": "An IoT device management dashboard with real-time sensor data visualization, device provisioning, alert management, firmware updates, and analytics",
+    "features": ["real_time_tracking", "data_visualization", "device_management", "alerts", "analytics", "user_auth", "admin_dashboard"],
+    "architecture": {
+      "components": [
+        {"id": "dashboard_ui", "name": "Dashboard UI", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "device_service", "name": "Device Manager", "type": "backend"},
+        {"id": "mqtt_broker", "name": "MQTT Broker", "type": "integration"},
+        {"id": "data_ingestion", "name": "Data Ingestion Pipeline", "type": "backend"},
+        {"id": "alert_service", "name": "Alert Engine", "type": "backend"},
+        {"id": "analytics_service", "name": "Analytics Service", "type": "backend"},
+        {"id": "firmware_service", "name": "Firmware Update Service", "type": "backend"},
+        {"id": "time_series_db", "name": "Time Series Database", "type": "database"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "websocket_server", "name": "WebSocket Server", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "dashboard_ui", "to": "api_server", "label": "REST/WebSocket"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "mqtt_broker", "to": "data_ingestion", "label": "Sensor data"},
+        {"from": "data_ingestion", "to": "time_series_db", "label": "Store metrics"},
+        {"from": "data_ingestion", "to": "alert_service", "label": "Threshold check"},
+        {"from": "api_server", "to": "device_service", "label": "Device CRUD"},
+        {"from": "api_server", "to": "analytics_service", "label": "Reports"},
+        {"from": "analytics_service", "to": "time_series_db", "label": "Query data"},
+        {"from": "device_service", "to": "firmware_service", "label": "OTA updates"},
+        {"from": "websocket_server", "to": "dashboard_ui", "label": "Live data"},
+        {"from": "device_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "fintech_app",
+    "description": "A personal finance management app with bank account linking, transaction categorization, budgeting tools, investment tracking, and financial insights",
+    "features": ["payments", "analytics", "data_visualization", "user_auth", "notifications", "admin_dashboard", "third_party_api"],
+    "architecture": {
+      "components": [
+        {"id": "web_app", "name": "Web Application", "type": "frontend"},
+        {"id": "mobile_app", "name": "Mobile App", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "account_service", "name": "Account Linking Service", "type": "backend"},
+        {"id": "plaid_integration", "name": "Plaid Integration", "type": "integration"},
+        {"id": "transaction_service", "name": "Transaction Service", "type": "backend"},
+        {"id": "categorization_engine", "name": "Categorization Engine", "type": "backend"},
+        {"id": "budget_service", "name": "Budget Service", "type": "backend"},
+        {"id": "investment_service", "name": "Investment Tracker", "type": "backend"},
+        {"id": "insights_engine", "name": "Financial Insights", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_app", "to": "api_gateway", "label": "REST API"},
+        {"from": "mobile_app", "to": "api_gateway", "label": "REST API"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth"},
+        {"from": "api_gateway", "to": "account_service", "label": "Link accounts"},
+        {"from": "account_service", "to": "plaid_integration", "label": "Bank API"},
+        {"from": "plaid_integration", "to": "transaction_service", "label": "Transactions"},
+        {"from": "transaction_service", "to": "categorization_engine", "label": "Classify"},
+        {"from": "api_gateway", "to": "budget_service", "label": "Budgets"},
+        {"from": "api_gateway", "to": "investment_service", "label": "Portfolios"},
+        {"from": "transaction_service", "to": "insights_engine", "label": "Analysis"},
+        {"from": "insights_engine", "to": "notification_service", "label": "Alerts"},
+        {"from": "transaction_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "food_delivery",
+    "description": "A food delivery platform with restaurant listings, menu management, order placement, real-time delivery tracking, driver management, and ratings",
+    "features": ["product_listing", "order_tracking", "real_time_tracking", "payments", "reviews", "user_auth", "notifications", "admin_dashboard"],
+    "architecture": {
+      "components": [
+        {"id": "customer_app", "name": "Customer App", "type": "frontend"},
+        {"id": "restaurant_portal", "name": "Restaurant Portal", "type": "frontend"},
+        {"id": "driver_app", "name": "Driver App", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "restaurant_service", "name": "Restaurant Service", "type": "backend"},
+        {"id": "menu_service", "name": "Menu Service", "type": "backend"},
+        {"id": "order_service", "name": "Order Service", "type": "backend"},
+        {"id": "delivery_service", "name": "Delivery Tracking", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "rating_service", "name": "Rating Service", "type": "backend"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "location_service", "name": "Location Service", "type": "integration"}
+      ],
+      "connections": [
+        {"from": "customer_app", "to": "api_gateway", "label": "REST API"},
+        {"from": "restaurant_portal", "to": "api_gateway", "label": "REST API"},
+        {"from": "driver_app", "to": "api_gateway", "label": "REST/WebSocket"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth"},
+        {"from": "api_gateway", "to": "restaurant_service", "label": "Listings"},
+        {"from": "api_gateway", "to": "order_service", "label": "Orders"},
+        {"from": "order_service", "to": "payment_gateway", "label": "Payment"},
+        {"from": "order_service", "to": "delivery_service", "label": "Dispatch"},
+        {"from": "delivery_service", "to": "location_service", "label": "GPS tracking"},
+        {"from": "order_service", "to": "notification_service", "label": "Updates"},
+        {"from": "api_gateway", "to": "rating_service", "label": "Ratings"},
+        {"from": "order_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "real_estate",
+    "description": "A real estate listing platform with property search, virtual tours, mortgage calculator, agent matching, and appointment scheduling",
+    "features": ["property_listing", "search", "virtual_tours", "calculator", "appointments", "user_auth", "chat", "notifications"],
+    "architecture": {
+      "components": [
+        {"id": "web_frontend", "name": "Web Frontend", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "listing_service", "name": "Listing Service", "type": "backend"},
+        {"id": "search_service", "name": "Search Engine", "type": "backend"},
+        {"id": "virtual_tour_service", "name": "Virtual Tour Service", "type": "integration"},
+        {"id": "mortgage_calculator", "name": "Mortgage Calculator", "type": "backend"},
+        {"id": "agent_service", "name": "Agent Matching", "type": "backend"},
+        {"id": "appointment_service", "name": "Appointment Scheduler", "type": "backend"},
+        {"id": "chat_service", "name": "Chat Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"}
+      ],
+      "connections": [
+        {"from": "web_frontend", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "search_service", "label": "Search"},
+        {"from": "search_service", "to": "listing_service", "label": "Results"},
+        {"from": "listing_service", "to": "virtual_tour_service", "label": "3D tours"},
+        {"from": "api_server", "to": "mortgage_calculator", "label": "Calculate"},
+        {"from": "api_server", "to": "agent_service", "label": "Match agents"},
+        {"from": "agent_service", "to": "appointment_service", "label": "Schedule"},
+        {"from": "api_server", "to": "chat_service", "label": "Messaging"},
+        {"from": "listing_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "listing_service", "to": "media_storage", "label": "Photos"}
+      ]
+    }
+  },
+  {
+    "id": "fitness_tracker",
+    "description": "A fitness tracking app with workout logging, meal planning, progress analytics, social challenges, wearable device sync, and personal coaching",
+    "features": ["data_visualization", "analytics", "social_features", "real_time_tracking", "user_auth", "notifications", "third_party_api"],
+    "architecture": {
+      "components": [
+        {"id": "mobile_app", "name": "Mobile App", "type": "frontend"},
+        {"id": "web_dashboard", "name": "Web Dashboard", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "workout_service", "name": "Workout Service", "type": "backend"},
+        {"id": "nutrition_service", "name": "Nutrition Service", "type": "backend"},
+        {"id": "analytics_service", "name": "Analytics Engine", "type": "backend"},
+        {"id": "social_service", "name": "Social & Challenges", "type": "backend"},
+        {"id": "wearable_sync", "name": "Wearable Sync", "type": "integration"},
+        {"id": "coaching_engine", "name": "AI Coaching Engine", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "mobile_app", "to": "api_server", "label": "REST API"},
+        {"from": "web_dashboard", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "workout_service", "label": "Log workouts"},
+        {"from": "api_server", "to": "nutrition_service", "label": "Meal plans"},
+        {"from": "workout_service", "to": "analytics_service", "label": "Stats"},
+        {"from": "api_server", "to": "social_service", "label": "Challenges"},
+        {"from": "wearable_sync", "to": "workout_service", "label": "Device data"},
+        {"from": "analytics_service", "to": "coaching_engine", "label": "Recommendations"},
+        {"from": "coaching_engine", "to": "notification_service", "label": "Coaching tips"},
+        {"from": "workout_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "event_management",
+    "description": "An event management platform with event creation, ticketing, attendee registration, venue management, speaker profiles, and live streaming",
+    "features": ["event_creation", "payments", "reservations", "user_auth", "notifications", "video_streaming", "admin_dashboard", "analytics"],
+    "architecture": {
+      "components": [
+        {"id": "event_website", "name": "Event Website", "type": "frontend"},
+        {"id": "admin_portal", "name": "Admin Portal", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "event_service", "name": "Event Service", "type": "backend"},
+        {"id": "ticketing_service", "name": "Ticketing Service", "type": "backend"},
+        {"id": "registration_service", "name": "Registration Service", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "venue_service", "name": "Venue Manager", "type": "backend"},
+        {"id": "streaming_service", "name": "Live Streaming", "type": "integration"},
+        {"id": "analytics_service", "name": "Analytics Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "event_website", "to": "api_server", "label": "REST API"},
+        {"from": "admin_portal", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "event_service", "label": "Events"},
+        {"from": "api_server", "to": "ticketing_service", "label": "Tickets"},
+        {"from": "ticketing_service", "to": "payment_gateway", "label": "Payment"},
+        {"from": "api_server", "to": "registration_service", "label": "Register"},
+        {"from": "event_service", "to": "venue_service", "label": "Venues"},
+        {"from": "event_service", "to": "streaming_service", "label": "Live stream"},
+        {"from": "api_server", "to": "analytics_service", "label": "Reports"},
+        {"from": "registration_service", "to": "notification_service", "label": "Confirmations"},
+        {"from": "event_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "content_cms",
+    "description": "A headless content management system with rich text editor, media library, content versioning, multi-language support, API-first delivery, and role-based access",
+    "features": ["content_management", "file_upload", "user_auth", "admin_dashboard", "search", "api_integration", "multi_language"],
+    "architecture": {
+      "components": [
+        {"id": "admin_ui", "name": "Admin Interface", "type": "frontend"},
+        {"id": "content_api", "name": "Content API", "type": "backend"},
+        {"id": "auth_service", "name": "Auth & RBAC", "type": "backend"},
+        {"id": "editor_service", "name": "Rich Text Editor", "type": "frontend"},
+        {"id": "media_service", "name": "Media Library", "type": "backend"},
+        {"id": "versioning_service", "name": "Content Versioning", "type": "backend"},
+        {"id": "i18n_service", "name": "Localization Service", "type": "backend"},
+        {"id": "search_service", "name": "Search Engine", "type": "backend"},
+        {"id": "cdn", "name": "CDN", "type": "integration"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Media Storage", "type": "storage"}
+      ],
+      "connections": [
+        {"from": "admin_ui", "to": "content_api", "label": "REST API"},
+        {"from": "editor_service", "to": "content_api", "label": "Save content"},
+        {"from": "content_api", "to": "auth_service", "label": "RBAC check"},
+        {"from": "content_api", "to": "media_service", "label": "Media ops"},
+        {"from": "content_api", "to": "versioning_service", "label": "Version control"},
+        {"from": "content_api", "to": "i18n_service", "label": "Translate"},
+        {"from": "content_api", "to": "search_service", "label": "Index content"},
+        {"from": "media_service", "to": "media_storage", "label": "Store files"},
+        {"from": "media_service", "to": "cdn", "label": "Distribute"},
+        {"from": "content_api", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "hr_management",
+    "description": "An HR management system with employee directory, leave management, payroll processing, performance reviews, recruitment pipeline, and org chart",
+    "features": ["user_profiles", "calendar", "payments", "analytics", "admin_dashboard", "user_auth", "notifications", "file_upload"],
+    "architecture": {
+      "components": [
+        {"id": "hr_portal", "name": "HR Portal", "type": "frontend"},
+        {"id": "employee_portal", "name": "Employee Self-Service", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "employee_service", "name": "Employee Directory", "type": "backend"},
+        {"id": "leave_service", "name": "Leave Manager", "type": "backend"},
+        {"id": "payroll_service", "name": "Payroll Service", "type": "backend"},
+        {"id": "performance_service", "name": "Performance Reviews", "type": "backend"},
+        {"id": "recruitment_service", "name": "Recruitment Pipeline", "type": "backend"},
+        {"id": "orgchart_service", "name": "Org Chart Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"},
+        {"id": "document_storage", "name": "Document Storage", "type": "storage"}
+      ],
+      "connections": [
+        {"from": "hr_portal", "to": "api_server", "label": "REST API"},
+        {"from": "employee_portal", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "employee_service", "label": "Directory"},
+        {"from": "api_server", "to": "leave_service", "label": "Leave requests"},
+        {"from": "api_server", "to": "payroll_service", "label": "Payroll"},
+        {"from": "api_server", "to": "performance_service", "label": "Reviews"},
+        {"from": "api_server", "to": "recruitment_service", "label": "Hiring"},
+        {"from": "employee_service", "to": "orgchart_service", "label": "Org structure"},
+        {"from": "leave_service", "to": "notification_service", "label": "Approvals"},
+        {"from": "recruitment_service", "to": "document_storage", "label": "Resumes"},
+        {"from": "employee_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "travel_planner",
+    "description": "A collaborative travel planning app with trip itineraries, flight and hotel search, budget tracking, shared trip boards, and local recommendations",
+    "features": ["search", "reservations", "collaboration", "analytics", "user_auth", "third_party_api", "notifications", "sharing"],
+    "architecture": {
+      "components": [
+        {"id": "web_app", "name": "Web Application", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "itinerary_service", "name": "Itinerary Service", "type": "backend"},
+        {"id": "flight_search", "name": "Flight Search", "type": "integration"},
+        {"id": "hotel_search", "name": "Hotel Search", "type": "integration"},
+        {"id": "budget_service", "name": "Budget Tracker", "type": "backend"},
+        {"id": "collaboration_service", "name": "Collaboration Engine", "type": "backend"},
+        {"id": "recommendation_engine", "name": "Recommendation Engine", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_app", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "itinerary_service", "label": "Trip plans"},
+        {"from": "itinerary_service", "to": "flight_search", "label": "Find flights"},
+        {"from": "itinerary_service", "to": "hotel_search", "label": "Find hotels"},
+        {"from": "api_server", "to": "budget_service", "label": "Budgets"},
+        {"from": "api_server", "to": "collaboration_service", "label": "Shared boards"},
+        {"from": "itinerary_service", "to": "recommendation_engine", "label": "Suggestions"},
+        {"from": "collaboration_service", "to": "notification_service", "label": "Updates"},
+        {"from": "itinerary_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "music_streaming",
+    "description": "A music streaming service with artist profiles, playlist management, audio playback, recommendation engine, social sharing, and offline downloads",
+    "features": ["audio_streaming", "search", "user_profiles", "social_features", "recommendations", "user_auth", "payments"],
+    "architecture": {
+      "components": [
+        {"id": "web_player", "name": "Web Player", "type": "frontend"},
+        {"id": "mobile_app", "name": "Mobile App", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "music_service", "name": "Music Catalog", "type": "backend"},
+        {"id": "playlist_service", "name": "Playlist Service", "type": "backend"},
+        {"id": "streaming_service", "name": "Audio Streaming", "type": "integration"},
+        {"id": "recommendation_engine", "name": "Recommendation Engine", "type": "backend"},
+        {"id": "social_service", "name": "Social Service", "type": "backend"},
+        {"id": "subscription_service", "name": "Subscription Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "audio_storage", "name": "Audio Storage", "type": "storage"},
+        {"id": "search_service", "name": "Search Engine", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_player", "to": "api_gateway", "label": "REST API"},
+        {"from": "mobile_app", "to": "api_gateway", "label": "REST API"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth"},
+        {"from": "api_gateway", "to": "music_service", "label": "Catalog"},
+        {"from": "api_gateway", "to": "playlist_service", "label": "Playlists"},
+        {"from": "music_service", "to": "streaming_service", "label": "Audio stream"},
+        {"from": "streaming_service", "to": "audio_storage", "label": "Fetch audio"},
+        {"from": "api_gateway", "to": "recommendation_engine", "label": "Discover"},
+        {"from": "api_gateway", "to": "social_service", "label": "Share/Follow"},
+        {"from": "api_gateway", "to": "subscription_service", "label": "Premium"},
+        {"from": "music_service", "to": "search_service", "label": "Index"},
+        {"from": "music_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "inventory_management",
+    "description": "An inventory management system with stock tracking, warehouse management, purchase orders, barcode scanning, reporting, and supplier management",
+    "features": ["inventory_tracking", "analytics", "admin_dashboard", "user_auth", "notifications", "reporting", "barcode_scanning"],
+    "architecture": {
+      "components": [
+        {"id": "admin_dashboard", "name": "Admin Dashboard", "type": "frontend"},
+        {"id": "warehouse_app", "name": "Warehouse Mobile App", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "inventory_service", "name": "Inventory Service", "type": "backend"},
+        {"id": "warehouse_service", "name": "Warehouse Manager", "type": "backend"},
+        {"id": "order_service", "name": "Purchase Order Service", "type": "backend"},
+        {"id": "barcode_service", "name": "Barcode Scanner", "type": "integration"},
+        {"id": "supplier_service", "name": "Supplier Manager", "type": "backend"},
+        {"id": "reporting_service", "name": "Reporting Engine", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "admin_dashboard", "to": "api_server", "label": "REST API"},
+        {"from": "warehouse_app", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "inventory_service", "label": "Stock ops"},
+        {"from": "api_server", "to": "warehouse_service", "label": "Warehouse ops"},
+        {"from": "warehouse_app", "to": "barcode_service", "label": "Scan items"},
+        {"from": "api_server", "to": "order_service", "label": "Purchase orders"},
+        {"from": "order_service", "to": "supplier_service", "label": "Supplier info"},
+        {"from": "inventory_service", "to": "notification_service", "label": "Low stock alerts"},
+        {"from": "api_server", "to": "reporting_service", "label": "Reports"},
+        {"from": "inventory_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "customer_support",
+    "description": "A customer support platform with ticket management, live chat, knowledge base, AI chatbot, agent dashboard, and customer satisfaction surveys",
+    "features": ["chat", "tickets", "knowledge_base", "ai_chatbot", "admin_dashboard", "user_auth", "analytics", "notifications"],
+    "architecture": {
+      "components": [
+        {"id": "customer_widget", "name": "Support Widget", "type": "frontend"},
+        {"id": "agent_dashboard", "name": "Agent Dashboard", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "ticket_service", "name": "Ticket Service", "type": "backend"},
+        {"id": "chat_service", "name": "Live Chat Service", "type": "backend"},
+        {"id": "websocket_server", "name": "WebSocket Server", "type": "backend"},
+        {"id": "kb_service", "name": "Knowledge Base", "type": "backend"},
+        {"id": "chatbot_service", "name": "AI Chatbot", "type": "backend"},
+        {"id": "survey_service", "name": "CSAT Survey Service", "type": "backend"},
+        {"id": "analytics_service", "name": "Analytics Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "customer_widget", "to": "api_server", "label": "REST/WebSocket"},
+        {"from": "agent_dashboard", "to": "api_server", "label": "REST/WebSocket"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "api_server", "to": "ticket_service", "label": "Tickets"},
+        {"from": "api_server", "to": "chat_service", "label": "Chat"},
+        {"from": "chat_service", "to": "websocket_server", "label": "Real-time"},
+        {"from": "chat_service", "to": "chatbot_service", "label": "AI response"},
+        {"from": "chatbot_service", "to": "kb_service", "label": "Search KB"},
+        {"from": "ticket_service", "to": "survey_service", "label": "Post-resolution"},
+        {"from": "api_server", "to": "analytics_service", "label": "Reports"},
+        {"from": "ticket_service", "to": "notification_service", "label": "Updates"},
+        {"from": "ticket_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  },
+  {
+    "id": "ride_sharing",
+    "description": "A ride-sharing platform with driver matching, real-time GPS tracking, fare calculation, payment processing, trip history, and driver ratings",
+    "features": ["real_time_tracking", "payments", "reviews", "user_auth", "notifications", "analytics", "admin_dashboard"],
+    "architecture": {
+      "components": [
+        {"id": "rider_app", "name": "Rider App", "type": "frontend"},
+        {"id": "driver_app", "name": "Driver App", "type": "frontend"},
+        {"id": "admin_portal", "name": "Admin Portal", "type": "frontend"},
+        {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "matching_service", "name": "Driver Matching", "type": "backend"},
+        {"id": "tracking_service", "name": "GPS Tracking", "type": "backend"},
+        {"id": "fare_service", "name": "Fare Calculator", "type": "backend"},
+        {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+        {"id": "trip_service", "name": "Trip Service", "type": "backend"},
+        {"id": "rating_service", "name": "Rating Service", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "location_service", "name": "Location Service", "type": "integration"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "rider_app", "to": "api_gateway", "label": "REST/WebSocket"},
+        {"from": "driver_app", "to": "api_gateway", "label": "REST/WebSocket"},
+        {"from": "api_gateway", "to": "auth_service", "label": "Auth"},
+        {"from": "api_gateway", "to": "matching_service", "label": "Find driver"},
+        {"from": "matching_service", "to": "location_service", "label": "Nearby drivers"},
+        {"from": "api_gateway", "to": "tracking_service", "label": "Live GPS"},
+        {"from": "trip_service", "to": "fare_service", "label": "Calculate fare"},
+        {"from": "fare_service", "to": "payment_gateway", "label": "Charge"},
+        {"from": "api_gateway", "to": "rating_service", "label": "Rate trip"},
+        {"from": "trip_service", "to": "notification_service", "label": "Trip updates"},
+        {"from": "trip_service", "to": "main_db", "label": "Read/Write"},
+        {"from": "admin_portal", "to": "api_gateway", "label": "Admin API"}
+      ]
+    }
+  },
+  {
+    "id": "news_aggregator",
+    "description": "A personalized news aggregation platform with RSS feed parsing, topic categorization, reading list, social sharing, and content recommendation",
+    "features": ["content_aggregation", "search", "recommendations", "social_features", "user_auth", "notifications", "analytics"],
+    "architecture": {
+      "components": [
+        {"id": "web_app", "name": "Web Application", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "feed_parser", "name": "RSS Feed Parser", "type": "backend"},
+        {"id": "categorization_service", "name": "Topic Categorizer", "type": "backend"},
+        {"id": "recommendation_engine", "name": "Recommendation Engine", "type": "backend"},
+        {"id": "reading_list_service", "name": "Reading List Service", "type": "backend"},
+        {"id": "social_service", "name": "Social Sharing", "type": "backend"},
+        {"id": "search_service", "name": "Search Engine", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "cache", "name": "Cache Layer", "type": "cache"}
+      ],
+      "connections": [
+        {"from": "web_app", "to": "api_server", "label": "REST API"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "feed_parser", "to": "categorization_service", "label": "Classify"},
+        {"from": "categorization_service", "to": "main_db", "label": "Store articles"},
+        {"from": "api_server", "to": "recommendation_engine", "label": "For you"},
+        {"from": "api_server", "to": "reading_list_service", "label": "Save articles"},
+        {"from": "api_server", "to": "social_service", "label": "Share"},
+        {"from": "api_server", "to": "search_service", "label": "Search articles"},
+        {"from": "recommendation_engine", "to": "cache", "label": "Cached recs"},
+        {"from": "search_service", "to": "main_db", "label": "Full-text search"}
+      ]
+    }
+  },
+  {
+    "id": "video_conferencing",
+    "description": "A video conferencing platform with multi-party video calls, screen sharing, chat, recording, virtual backgrounds, and meeting scheduling",
+    "features": ["video_call", "chat", "screen_sharing", "recording", "appointments", "user_auth", "notifications"],
+    "architecture": {
+      "components": [
+        {"id": "web_client", "name": "Web Client", "type": "frontend"},
+        {"id": "api_server", "name": "API Server", "type": "backend"},
+        {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+        {"id": "signaling_server", "name": "Signaling Server", "type": "backend"},
+        {"id": "media_server", "name": "Media Server (SFU)", "type": "backend"},
+        {"id": "chat_service", "name": "Chat Service", "type": "backend"},
+        {"id": "recording_service", "name": "Recording Service", "type": "backend"},
+        {"id": "scheduling_service", "name": "Meeting Scheduler", "type": "backend"},
+        {"id": "main_db", "name": "Main Database", "type": "database"},
+        {"id": "media_storage", "name": "Recording Storage", "type": "storage"},
+        {"id": "notification_service", "name": "Notification Service", "type": "backend"}
+      ],
+      "connections": [
+        {"from": "web_client", "to": "api_server", "label": "REST API"},
+        {"from": "web_client", "to": "signaling_server", "label": "WebSocket"},
+        {"from": "signaling_server", "to": "media_server", "label": "Media routing"},
+        {"from": "api_server", "to": "auth_service", "label": "Auth"},
+        {"from": "web_client", "to": "chat_service", "label": "Chat messages"},
+        {"from": "media_server", "to": "recording_service", "label": "Record stream"},
+        {"from": "recording_service", "to": "media_storage", "label": "Save recording"},
+        {"from": "api_server", "to": "scheduling_service", "label": "Schedule meeting"},
+        {"from": "scheduling_service", "to": "notification_service", "label": "Invite"},
+        {"from": "scheduling_service", "to": "main_db", "label": "Read/Write"}
+      ]
+    }
+  }
+]

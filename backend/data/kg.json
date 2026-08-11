@@ -1,0 +1,435 @@
+{
+  "payments": {
+    "components": [
+      {"id": "payment_gateway", "name": "Payment Gateway", "type": "integration"},
+      {"id": "transaction_db", "name": "Transaction Database", "type": "database"},
+      {"id": "checkout_ui", "name": "Checkout UI", "type": "frontend"},
+      {"id": "billing_service", "name": "Billing Service", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "checkout_ui", "to": "payment_gateway", "label": "Process payment"},
+      {"from": "payment_gateway", "to": "transaction_db", "label": "Record transaction"},
+      {"from": "billing_service", "to": "payment_gateway", "label": "Invoice"}
+    ],
+    "synonyms": ["payment", "pay", "checkout", "billing", "stripe", "transactions", "purchase", "buy"]
+  },
+  "chat": {
+    "components": [
+      {"id": "chat_service", "name": "Chat Service", "type": "backend"},
+      {"id": "websocket_server", "name": "WebSocket Server", "type": "backend"},
+      {"id": "chat_ui", "name": "Chat Interface", "type": "frontend"},
+      {"id": "message_db", "name": "Message Store", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "chat_ui", "to": "websocket_server", "label": "Real-time messages"},
+      {"from": "websocket_server", "to": "chat_service", "label": "Message handling"},
+      {"from": "chat_service", "to": "message_db", "label": "Persist messages"}
+    ],
+    "synonyms": ["messaging", "instant_messaging", "dm", "direct_message", "conversation"]
+  },
+  "auth": {
+    "components": [
+      {"id": "auth_service", "name": "Auth Service", "type": "backend"},
+      {"id": "user_db", "name": "User Database", "type": "database"},
+      {"id": "login_ui", "name": "Login/Register UI", "type": "frontend"},
+      {"id": "session_manager", "name": "Session Manager", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "login_ui", "to": "auth_service", "label": "Login/Register"},
+      {"from": "auth_service", "to": "user_db", "label": "User lookup"},
+      {"from": "auth_service", "to": "session_manager", "label": "JWT/Session"}
+    ],
+    "synonyms": ["authentication", "authorization", "login", "signup", "register", "user_auth", "oauth", "sso", "user_management"]
+  },
+  "real_time_tracking": {
+    "components": [
+      {"id": "tracking_service", "name": "Tracking Service", "type": "backend"},
+      {"id": "location_service", "name": "Location Service", "type": "integration"},
+      {"id": "map_ui", "name": "Map Interface", "type": "frontend"},
+      {"id": "websocket_server", "name": "WebSocket Server", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "location_service", "to": "tracking_service", "label": "GPS data"},
+      {"from": "tracking_service", "to": "websocket_server", "label": "Push updates"},
+      {"from": "websocket_server", "to": "map_ui", "label": "Live position"}
+    ],
+    "synonyms": ["gps", "location_tracking", "live_tracking", "geolocation", "tracking", "maps"]
+  },
+  "file_upload": {
+    "components": [
+      {"id": "upload_service", "name": "Upload Service", "type": "backend"},
+      {"id": "file_storage", "name": "File Storage", "type": "storage"},
+      {"id": "upload_ui", "name": "Upload Interface", "type": "frontend"},
+      {"id": "media_processor", "name": "Media Processor", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "upload_ui", "to": "upload_service", "label": "Upload file"},
+      {"from": "upload_service", "to": "media_processor", "label": "Process/resize"},
+      {"from": "media_processor", "to": "file_storage", "label": "Store file"}
+    ],
+    "synonyms": ["upload", "media_upload", "image_upload", "document_upload", "file_management", "attachments"]
+  },
+  "notifications": {
+    "components": [
+      {"id": "notification_service", "name": "Notification Service", "type": "backend"},
+      {"id": "email_provider", "name": "Email Provider", "type": "integration"},
+      {"id": "push_service", "name": "Push Notification Service", "type": "integration"},
+      {"id": "notification_db", "name": "Notification Store", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "notification_service", "to": "email_provider", "label": "Send email"},
+      {"from": "notification_service", "to": "push_service", "label": "Push notify"},
+      {"from": "notification_service", "to": "notification_db", "label": "Log notifications"}
+    ],
+    "synonyms": ["alerts", "push_notifications", "email_notifications", "reminders", "notify"]
+  },
+  "search": {
+    "components": [
+      {"id": "search_service", "name": "Search Service", "type": "backend"},
+      {"id": "search_index", "name": "Search Index", "type": "database"},
+      {"id": "search_ui", "name": "Search Interface", "type": "frontend"}
+    ],
+    "dependencies": [
+      {"from": "search_ui", "to": "search_service", "label": "Query"},
+      {"from": "search_service", "to": "search_index", "label": "Full-text search"}
+    ],
+    "synonyms": ["full_text_search", "elasticsearch", "filtering", "find", "lookup", "discover"]
+  },
+  "reviews": {
+    "components": [
+      {"id": "review_service", "name": "Review Service", "type": "backend"},
+      {"id": "rating_engine", "name": "Rating Engine", "type": "backend"},
+      {"id": "review_ui", "name": "Review Interface", "type": "frontend"},
+      {"id": "review_db", "name": "Review Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "review_ui", "to": "review_service", "label": "Submit review"},
+      {"from": "review_service", "to": "rating_engine", "label": "Calculate rating"},
+      {"from": "review_service", "to": "review_db", "label": "Store reviews"}
+    ],
+    "synonyms": ["ratings", "feedback", "testimonials", "stars", "rating_system"]
+  },
+  "admin_dashboard": {
+    "components": [
+      {"id": "admin_ui", "name": "Admin Dashboard", "type": "frontend"},
+      {"id": "admin_api", "name": "Admin API", "type": "backend"},
+      {"id": "analytics_service", "name": "Analytics Service", "type": "backend"},
+      {"id": "user_management", "name": "User Management", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "admin_ui", "to": "admin_api", "label": "Admin operations"},
+      {"from": "admin_api", "to": "analytics_service", "label": "Metrics"},
+      {"from": "admin_api", "to": "user_management", "label": "Manage users"}
+    ],
+    "synonyms": ["admin", "admin_panel", "backoffice", "management_console", "dashboard", "cms"]
+  },
+  "video_streaming": {
+    "components": [
+      {"id": "video_service", "name": "Video Service", "type": "backend"},
+      {"id": "transcoding_service", "name": "Transcoding Service", "type": "backend"},
+      {"id": "video_player", "name": "Video Player", "type": "frontend"},
+      {"id": "cdn", "name": "CDN", "type": "integration"},
+      {"id": "video_storage", "name": "Video Storage", "type": "storage"}
+    ],
+    "dependencies": [
+      {"from": "video_player", "to": "cdn", "label": "Stream video"},
+      {"from": "video_service", "to": "transcoding_service", "label": "Transcode"},
+      {"from": "transcoding_service", "to": "video_storage", "label": "Store segments"},
+      {"from": "video_storage", "to": "cdn", "label": "Distribute"}
+    ],
+    "synonyms": ["video", "streaming", "live_video", "vod", "video_call", "video_conferencing"]
+  },
+  "analytics": {
+    "components": [
+      {"id": "analytics_service", "name": "Analytics Service", "type": "backend"},
+      {"id": "data_warehouse", "name": "Data Warehouse", "type": "database"},
+      {"id": "dashboard_ui", "name": "Analytics Dashboard", "type": "frontend"},
+      {"id": "reporting_engine", "name": "Reporting Engine", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "dashboard_ui", "to": "analytics_service", "label": "Query metrics"},
+      {"from": "analytics_service", "to": "data_warehouse", "label": "Aggregate data"},
+      {"from": "analytics_service", "to": "reporting_engine", "label": "Generate reports"}
+    ],
+    "synonyms": ["metrics", "reporting", "data_visualization", "insights", "statistics", "monitoring"]
+  },
+  "user_profiles": {
+    "components": [
+      {"id": "profile_service", "name": "Profile Service", "type": "backend"},
+      {"id": "profile_ui", "name": "Profile UI", "type": "frontend"},
+      {"id": "avatar_storage", "name": "Avatar Storage", "type": "storage"},
+      {"id": "user_db", "name": "User Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "profile_ui", "to": "profile_service", "label": "View/Edit profile"},
+      {"from": "profile_service", "to": "user_db", "label": "Read/Write"},
+      {"from": "profile_service", "to": "avatar_storage", "label": "Store avatar"}
+    ],
+    "synonyms": ["profiles", "user_profiles", "account", "my_account", "user_settings"]
+  },
+  "shopping_cart": {
+    "components": [
+      {"id": "cart_service", "name": "Cart Service", "type": "backend"},
+      {"id": "cart_ui", "name": "Cart Interface", "type": "frontend"},
+      {"id": "cart_db", "name": "Cart Storage", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "cart_ui", "to": "cart_service", "label": "Add/Remove items"},
+      {"from": "cart_service", "to": "cart_db", "label": "Persist cart"}
+    ],
+    "synonyms": ["cart", "basket", "wishlist", "add_to_cart"]
+  },
+  "order_tracking": {
+    "components": [
+      {"id": "order_service", "name": "Order Service", "type": "backend"},
+      {"id": "shipping_service", "name": "Shipping Integration", "type": "integration"},
+      {"id": "order_ui", "name": "Order Tracking UI", "type": "frontend"},
+      {"id": "order_db", "name": "Order Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "order_ui", "to": "order_service", "label": "Track order"},
+      {"from": "order_service", "to": "shipping_service", "label": "Shipment status"},
+      {"from": "order_service", "to": "order_db", "label": "Read/Write"}
+    ],
+    "synonyms": ["orders", "order_management", "shipping", "delivery", "fulfillment"]
+  },
+  "appointments": {
+    "components": [
+      {"id": "appointment_service", "name": "Appointment Scheduler", "type": "backend"},
+      {"id": "calendar_ui", "name": "Calendar Interface", "type": "frontend"},
+      {"id": "availability_service", "name": "Availability Service", "type": "backend"},
+      {"id": "appointment_db", "name": "Appointment Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "calendar_ui", "to": "appointment_service", "label": "Book slot"},
+      {"from": "appointment_service", "to": "availability_service", "label": "Check availability"},
+      {"from": "appointment_service", "to": "appointment_db", "label": "Store booking"}
+    ],
+    "synonyms": ["scheduling", "booking", "calendar", "reservations", "schedule", "time_slots"]
+  },
+  "social_features": {
+    "components": [
+      {"id": "social_service", "name": "Social Service", "type": "backend"},
+      {"id": "feed_service", "name": "Feed Service", "type": "backend"},
+      {"id": "social_ui", "name": "Social Feed UI", "type": "frontend"},
+      {"id": "social_db", "name": "Social Graph Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "social_ui", "to": "social_service", "label": "Follow/Like/Share"},
+      {"from": "social_service", "to": "feed_service", "label": "Update feed"},
+      {"from": "social_service", "to": "social_db", "label": "Social graph"}
+    ],
+    "synonyms": ["social", "followers", "likes", "sharing", "friends", "connections", "community", "follow"]
+  },
+  "email": {
+    "components": [
+      {"id": "email_service", "name": "Email Service", "type": "backend"},
+      {"id": "email_provider", "name": "Email Provider", "type": "integration"},
+      {"id": "template_engine", "name": "Email Template Engine", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "email_service", "to": "template_engine", "label": "Render template"},
+      {"from": "email_service", "to": "email_provider", "label": "Send email"}
+    ],
+    "synonyms": ["email_notifications", "transactional_email", "mailer", "sendgrid", "mailgun"]
+  },
+  "product_listing": {
+    "components": [
+      {"id": "product_service", "name": "Product Service", "type": "backend"},
+      {"id": "catalog_ui", "name": "Product Catalog UI", "type": "frontend"},
+      {"id": "product_db", "name": "Product Database", "type": "database"},
+      {"id": "media_storage", "name": "Product Media Storage", "type": "storage"}
+    ],
+    "dependencies": [
+      {"from": "catalog_ui", "to": "product_service", "label": "Browse products"},
+      {"from": "product_service", "to": "product_db", "label": "CRUD operations"},
+      {"from": "product_service", "to": "media_storage", "label": "Product images"}
+    ],
+    "synonyms": ["products", "catalog", "listings", "inventory", "items", "marketplace"]
+  },
+  "recommendations": {
+    "components": [
+      {"id": "recommendation_engine", "name": "Recommendation Engine", "type": "backend"},
+      {"id": "ml_model", "name": "ML Model Service", "type": "backend"},
+      {"id": "user_behavior_db", "name": "User Behavior Store", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "recommendation_engine", "to": "ml_model", "label": "Predict preferences"},
+      {"from": "recommendation_engine", "to": "user_behavior_db", "label": "User history"}
+    ],
+    "synonyms": ["personalization", "suggestions", "for_you", "discover", "ai_recommendations"]
+  },
+  "content_moderation": {
+    "components": [
+      {"id": "moderation_service", "name": "Content Moderation", "type": "backend"},
+      {"id": "moderation_queue", "name": "Moderation Queue", "type": "backend"},
+      {"id": "moderation_ui", "name": "Moderation Dashboard", "type": "frontend"}
+    ],
+    "dependencies": [
+      {"from": "moderation_service", "to": "moderation_queue", "label": "Flag content"},
+      {"from": "moderation_ui", "to": "moderation_queue", "label": "Review flagged"}
+    ],
+    "synonyms": ["moderation", "content_filter", "spam_filter", "abuse_detection", "safety"]
+  },
+  "api_integration": {
+    "components": [
+      {"id": "api_gateway", "name": "API Gateway", "type": "backend"},
+      {"id": "rate_limiter", "name": "Rate Limiter", "type": "backend"},
+      {"id": "api_docs", "name": "API Documentation", "type": "frontend"}
+    ],
+    "dependencies": [
+      {"from": "api_gateway", "to": "rate_limiter", "label": "Rate limiting"},
+      {"from": "api_docs", "to": "api_gateway", "label": "Document endpoints"}
+    ],
+    "synonyms": ["api", "rest_api", "graphql", "third_party_api", "webhook", "integration"]
+  },
+  "caching": {
+    "components": [
+      {"id": "cache_service", "name": "Cache Service", "type": "backend"},
+      {"id": "redis", "name": "Redis Cache", "type": "cache"}
+    ],
+    "dependencies": [
+      {"from": "cache_service", "to": "redis", "label": "Cache read/write"}
+    ],
+    "synonyms": ["cache", "redis", "memcached", "cdn_cache", "performance"]
+  },
+  "data_export": {
+    "components": [
+      {"id": "export_service", "name": "Export Service", "type": "backend"},
+      {"id": "report_generator", "name": "Report Generator", "type": "backend"},
+      {"id": "export_storage", "name": "Export Storage", "type": "storage"}
+    ],
+    "dependencies": [
+      {"from": "export_service", "to": "report_generator", "label": "Generate report"},
+      {"from": "report_generator", "to": "export_storage", "label": "Store export"}
+    ],
+    "synonyms": ["export", "download", "csv_export", "pdf_export", "reporting"]
+  },
+  "multi_language": {
+    "components": [
+      {"id": "i18n_service", "name": "Internationalization Service", "type": "backend"},
+      {"id": "translation_db", "name": "Translation Database", "type": "database"},
+      {"id": "locale_selector", "name": "Locale Selector UI", "type": "frontend"}
+    ],
+    "dependencies": [
+      {"from": "locale_selector", "to": "i18n_service", "label": "Select language"},
+      {"from": "i18n_service", "to": "translation_db", "label": "Fetch translations"}
+    ],
+    "synonyms": ["i18n", "localization", "translations", "multilingual", "language_support"]
+  },
+  "two_factor_auth": {
+    "components": [
+      {"id": "mfa_service", "name": "MFA Service", "type": "backend"},
+      {"id": "otp_provider", "name": "OTP Provider", "type": "integration"},
+      {"id": "mfa_ui", "name": "MFA Setup UI", "type": "frontend"}
+    ],
+    "dependencies": [
+      {"from": "mfa_ui", "to": "mfa_service", "label": "Setup/Verify"},
+      {"from": "mfa_service", "to": "otp_provider", "label": "Generate OTP"}
+    ],
+    "synonyms": ["2fa", "mfa", "otp", "two_factor", "security", "verification"]
+  },
+  "subscription": {
+    "components": [
+      {"id": "subscription_service", "name": "Subscription Service", "type": "backend"},
+      {"id": "plan_manager", "name": "Plan Manager", "type": "backend"},
+      {"id": "pricing_ui", "name": "Pricing Page", "type": "frontend"},
+      {"id": "subscription_db", "name": "Subscription Database", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "pricing_ui", "to": "subscription_service", "label": "Subscribe"},
+      {"from": "subscription_service", "to": "plan_manager", "label": "Manage plans"},
+      {"from": "subscription_service", "to": "subscription_db", "label": "Store subscriptions"}
+    ],
+    "synonyms": ["subscriptions", "premium", "plans", "pricing", "membership", "freemium", "saas"]
+  },
+  "ai_chatbot": {
+    "components": [
+      {"id": "chatbot_service", "name": "AI Chatbot Service", "type": "backend"},
+      {"id": "nlp_engine", "name": "NLP Engine", "type": "backend"},
+      {"id": "chatbot_ui", "name": "Chatbot Widget", "type": "frontend"},
+      {"id": "knowledge_base", "name": "Knowledge Base", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "chatbot_ui", "to": "chatbot_service", "label": "User message"},
+      {"from": "chatbot_service", "to": "nlp_engine", "label": "Process intent"},
+      {"from": "chatbot_service", "to": "knowledge_base", "label": "Retrieve answers"}
+    ],
+    "synonyms": ["chatbot", "virtual_assistant", "ai_assistant", "conversational_ai", "bot"]
+  },
+  "logging": {
+    "components": [
+      {"id": "logging_service", "name": "Logging Service", "type": "backend"},
+      {"id": "log_aggregator", "name": "Log Aggregator", "type": "backend"},
+      {"id": "log_storage", "name": "Log Storage", "type": "database"}
+    ],
+    "dependencies": [
+      {"from": "logging_service", "to": "log_aggregator", "label": "Collect logs"},
+      {"from": "log_aggregator", "to": "log_storage", "label": "Store & index"}
+    ],
+    "synonyms": ["logs", "audit_log", "activity_log", "monitoring", "observability"]
+  },
+  "collaboration": {
+    "components": [
+      {"id": "collab_service", "name": "Collaboration Service", "type": "backend"},
+      {"id": "realtime_sync", "name": "Real-time Sync Engine", "type": "backend"},
+      {"id": "collab_ui", "name": "Shared Workspace UI", "type": "frontend"},
+      {"id": "version_service", "name": "Version Control", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "collab_ui", "to": "collab_service", "label": "Shared editing"},
+      {"from": "collab_service", "to": "realtime_sync", "label": "Sync changes"},
+      {"from": "collab_service", "to": "version_service", "label": "Version history"}
+    ],
+    "synonyms": ["shared_editing", "teamwork", "co_editing", "multiplayer", "shared_workspace"]
+  },
+  "vector_db_ai": {
+    "components": [
+      {"id": "vector_db", "name": "Vector Database", "type": "database"},
+      {"id": "embedding_service", "name": "Embedding Service", "type": "backend"},
+      {"id": "llm_agent", "name": "LLM Agent Orchestrator", "type": "backend"},
+      {"id": "rag_pipeline", "name": "RAG Retrieval Pipeline", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "llm_agent", "to": "rag_pipeline", "label": "Retrieve context"},
+      {"from": "rag_pipeline", "to": "embedding_service", "label": "Embed query"},
+      {"from": "rag_pipeline", "to": "vector_db", "label": "Similarity search"}
+    ],
+    "synonyms": ["vector_database", "vector_search", "embeddings", "chroma", "pinecone", "qdrant", "rag", "llm_agents", "ai_agent"]
+  },
+  "mobile_app": {
+    "components": [
+      {"id": "mobile_ui", "name": "Mobile Application UI", "type": "frontend"},
+      {"id": "push_notification_gateway", "name": "APNS / FCM Gateway", "type": "integration"},
+      {"id": "mobile_api_gateway", "name": "Mobile Backend Gateway", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "mobile_ui", "to": "mobile_api_gateway", "label": "API requests"},
+      {"from": "mobile_api_gateway", "to": "push_notification_gateway", "label": "Trigger push notification"}
+    ],
+    "synonyms": ["mobile", "react_native", "flutter", "ios", "android", "mobile_app", "app"]
+  },
+  "data_pipeline": {
+    "components": [
+      {"id": "event_stream", "name": "Kafka Event Bus", "type": "backend"},
+      {"id": "etl_service", "name": "ETL Processing Worker", "type": "backend"},
+      {"id": "data_lake", "name": "Data Lake Storage", "type": "storage"}
+    ],
+    "dependencies": [
+      {"from": "event_stream", "to": "etl_service", "label": "Stream event batch"},
+      {"from": "etl_service", "to": "data_lake", "label": "Write parquet"}
+    ],
+    "synonyms": ["pipeline", "etl", "kafka", "spark", "batch_processing", "event_driven", "data_engineering"]
+  },
+  "graphql_api": {
+    "components": [
+      {"id": "graphql_server", "name": "GraphQL Gateway", "type": "backend"},
+      {"id": "schema_registry", "name": "Schema Registry", "type": "backend"}
+    ],
+    "dependencies": [
+      {"from": "graphql_server", "to": "schema_registry", "label": "Resolve types"}
+    ],
+    "synonyms": ["graphql", "apollo", "resolvers", "query_language"]
+  }
+}
+

@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-dotenv
+groq
+huggingface-hub
+sentence-transformers
+faiss-cpu
+pydantic
+pytest
+httpx
