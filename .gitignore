@@ -6,7 +6,7 @@ __pycache__/
 .pytest_cache/
 
 # Build output
-frontend/dist/
+# frontend/dist/ (committed for seamless 1-click cloud deployment on Render/Railway)
 
 # Environment
 backend/.env
@@ -26,5 +26,5 @@ Thumbs.db
 
 # Python
 *.egg-info/
-dist/
-build/
+/dist/
+/build/

@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+gunicorn
+sqlalchemy
+python-dotenv
+groq
+huggingface-hub
+sentence-transformers
+faiss-cpu
+pydantic
+pytest
+httpx
+scikit-learn
+numpy

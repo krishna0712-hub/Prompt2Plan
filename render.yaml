@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: prompt2plan
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

@@ -21,24 +21,35 @@ def run_tests():
 
 def build_frontend():
     """Build the React frontend to ensure dist/ has the latest UI/UX code."""
+    index_file = os.path.join(DIST_DIR, "index.html")
+    if os.path.isfile(index_file) and not os.environ.get("FORCE_FRONTEND_BUILD"):
+        print("[INFO] Pre-built frontend assets found in frontend/dist. Skipping build.")
+        return
+
     print("[BUILD] Rebuilding frontend assets for latest UI/UX...")
     npm_cmd = "npm.cmd" if sys.platform == "win32" else "npm"
     
-    if not os.path.isdir(os.path.join(FRONTEND_DIR, "node_modules")):
-        print("  Running: npm install")
-        subprocess.check_call([npm_cmd, "install"], cwd=FRONTEND_DIR)
+    try:
+        if not os.path.isdir(os.path.join(FRONTEND_DIR, "node_modules")):
+            print("  Running: npm install")
+            subprocess.check_call([npm_cmd, "install"], cwd=FRONTEND_DIR)
 
-    print("  Running: npm run build")
-    subprocess.check_call([npm_cmd, "run", "build"], cwd=FRONTEND_DIR)
-
-    print("[OK] Frontend built successfully")
+        print("  Running: npm run build")
+        subprocess.check_call([npm_cmd, "run", "build"], cwd=FRONTEND_DIR)
+        print("[OK] Frontend built successfully")
+    except Exception as e:
+        if os.path.isfile(index_file):
+            print(f"[WARN] npm build failed ({e}), using existing frontend/dist assets.")
+        else:
+            raise
 
 
 def start_server():
-    """Start the FastAPI server on port 8000."""
+    """Start the FastAPI server on port (defaults to PORT env var or 8000)."""
+    port = int(os.environ.get("PORT", 8000))
     print()
     print("=" * 50)
-    print("  Prompt2Plan is running at http://localhost:8000")
+    print(f"  Prompt2Plan is running at http://0.0.0.0:{port}")
     print("=" * 50)
     print()
 
@@ -46,7 +57,7 @@ def start_server():
     uvicorn.run(
         "backend.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=port,
         reload=False,
         log_level="info",
     )
@@ -62,7 +73,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\nShutting down Prompt2Plan...")
         sys.exit(0)
-    except subprocess.CalledProcessError as e:
-        print(f"\n[ERROR] Build failed: {e}")
-        print("  Make sure Node.js and npm are installed.")
+    except Exception as e:
+        print(f"\n[ERROR] Startup failed: {e}")
         sys.exit(1)
