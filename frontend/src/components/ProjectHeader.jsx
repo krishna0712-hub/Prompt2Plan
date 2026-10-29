@@ -27,22 +27,26 @@ export default function ProjectHeader({ project, onNewPlan }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full bg-[#13131A] border border-[#1E1E28] rounded-2xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl"
+      className="w-full border rounded-2xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl"
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        borderColor: 'var(--border-subtle)',
+      }}
     >
       {/* Left Details */}
       <div className="space-y-2">
         <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             Project Plan #{project.id}
           </h2>
           <span className={`text-xs px-3 py-1 rounded-full font-mono font-semibold border ${badge.bg} ${badge.textCol} ${badge.border}`}>
             {badge.text}
           </span>
-          <span className="text-xs text-[#6B6B7B] font-mono">
+          <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
             Created: {formattedDate}
           </span>
         </div>
-        <p className="text-sm sm:text-base text-[#A0A0B0] font-normal leading-relaxed max-w-3xl">
+        <p className="text-sm sm:text-base font-normal leading-relaxed max-w-3xl" style={{ color: 'var(--text-secondary)' }}>
           "{project.idea_text}"
         </p>
       </div>
@@ -53,7 +57,12 @@ export default function ProjectHeader({ project, onNewPlan }) {
         <div className="relative">
           <button
             onClick={() => setIsExportOpen(!isExportOpen)}
-            className="text-xs font-semibold px-4 py-2.5 rounded-xl bg-[#1E1E28] text-[#A0A0B0] border border-[#1E1E28] hover:border-[#7C5CFF] hover:text-white transition-all flex items-center gap-2 cursor-pointer"
+            className="text-xs font-semibold px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:border-[var(--accent-color)]"
+            style={{
+              backgroundColor: 'var(--bg-elevated)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-primary)',
+            }}
           >
             <span>📥 Export Plan</span>
             <span>{isExportOpen ? '▲' : '▼'}</span>
@@ -66,13 +75,18 @@ export default function ProjectHeader({ project, onNewPlan }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 top-12 w-52 rounded-xl bg-[#13131A] border border-[#1E1E28] shadow-2xl p-2 z-50 space-y-1"
+                className="absolute right-0 top-12 w-52 rounded-xl border shadow-2xl p-2 z-50 space-y-1"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-subtle)',
+                }}
               >
                 <a
                   href={`/api/projects/${project.id}/export?format=markdown`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-xs px-3 py-2 rounded-lg text-[#A0A0B0] hover:bg-[#1E1E28] hover:text-white transition-colors"
+                  className="block text-xs px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-elevated)]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   📝 Markdown (.md)
                 </a>
@@ -80,7 +94,8 @@ export default function ProjectHeader({ project, onNewPlan }) {
                   href={`/api/projects/${project.id}/export?format=json`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-xs px-3 py-2 rounded-lg text-[#A0A0B0] hover:bg-[#1E1E28] hover:text-white transition-colors"
+                  className="block text-xs px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-elevated)]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   📦 JSON Data (.json)
                 </a>
@@ -88,7 +103,8 @@ export default function ProjectHeader({ project, onNewPlan }) {
                   href={`/api/projects/${project.id}/export?format=jira_csv`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-xs px-3 py-2 rounded-lg text-[#A0A0B0] hover:bg-[#1E1E28] hover:text-white transition-colors"
+                  className="block text-xs px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-elevated)]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   🔷 Jira Import (.csv)
                 </a>
@@ -96,7 +112,8 @@ export default function ProjectHeader({ project, onNewPlan }) {
                   href={`/api/projects/${project.id}/export?format=github_csv`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-xs px-3 py-2 rounded-lg text-[#A0A0B0] hover:bg-[#1E1E28] hover:text-white transition-colors"
+                  className="block text-xs px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-elevated)]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   🐙 GitHub Issues (.csv)
                 </a>
@@ -104,7 +121,8 @@ export default function ProjectHeader({ project, onNewPlan }) {
                   href={`/api/projects/${project.id}/export?format=pdf`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-xs px-3 py-2 rounded-lg text-[#A0A0B0] hover:bg-[#1E1E28] hover:text-white transition-colors"
+                  className="block text-xs px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-elevated)]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   📄 Report / Printable PDF
                 </a>
@@ -126,3 +144,4 @@ export default function ProjectHeader({ project, onNewPlan }) {
     </motion.div>
   );
 }
+

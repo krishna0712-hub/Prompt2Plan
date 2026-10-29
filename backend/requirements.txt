@@ -9,3 +9,5 @@ faiss-cpu
 pydantic
 pytest
 httpx
+scikit-learn
+numpy

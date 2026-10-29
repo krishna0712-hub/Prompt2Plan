@@ -46,6 +46,7 @@ class Task(Base):
     component = Column(String(200), nullable=True)
     phase = Column(String(100), nullable=False, default="Setup")
     estimated_hours = Column(Float, nullable=False, default=4.0)
+    actual_hours = Column(Float, nullable=True)
     status = Column(String(50), nullable=False, default="todo")  # todo, in_progress, done
 
     project = relationship("Project", back_populates="tasks")
@@ -60,13 +61,36 @@ class Milestone(Base):
     start_day = Column(Integer, nullable=False, default=0)
     end_day = Column(Integer, nullable=False, default=1)
     total_hours = Column(Float, nullable=False, default=0.0)
+    optimistic_hours = Column(Float, nullable=True, default=0.0)
+    pessimistic_hours = Column(Float, nullable=True, default=0.0)
 
     project = relationship("Project", back_populates="milestones")
 
 
 def init_db():
-    """Create all tables if they don't exist."""
+    """Create all tables if they don't exist and run auto-migrations for new columns."""
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migrate sqlite columns if database pre-existed
+    with engine.connect() as conn:
+        from sqlalchemy import text
+        try:
+            conn.execute(text("ALTER TABLE tasks ADD COLUMN actual_hours FLOAT"))
+            conn.commit()
+        except Exception:
+            pass
+
+        try:
+            conn.execute(text("ALTER TABLE milestones ADD COLUMN optimistic_hours FLOAT"))
+            conn.commit()
+        except Exception:
+            pass
+
+        try:
+            conn.execute(text("ALTER TABLE milestones ADD COLUMN pessimistic_hours FLOAT"))
+            conn.commit()
+        except Exception:
+            pass
 
 
 def get_db():

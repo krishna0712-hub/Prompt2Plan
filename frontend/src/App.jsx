@@ -16,12 +16,31 @@ const TABS = [
 ];
 
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('prompt2plan_theme') || 'dark';
+  });
   const [loading, setLoading] = useState(false);
   const [projectData, setProjectData] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [history, setHistory] = useState([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+    }
+    localStorage.setItem('prompt2plan_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const fetchHistory = async () => {
     try {
@@ -94,7 +113,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0A0F] text-white font-sans selection:bg-[#7C5CFF]/30 selection:text-white">
+    <div className="min-h-screen flex flex-col app-bg font-sans transition-colors duration-300">
       {/* Fixed Glass-Morphism Header */}
       <header className="sticky top-0 z-50 w-full glass-morphism px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer" onClick={handleNewPlan}>
@@ -107,16 +126,30 @@ export default function App() {
             <h1 className="text-xl font-extrabold tracking-tight">
               <span className="gradient-text">Prompt2Plan</span>
             </h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E1E28] text-[#9B7BFF] border border-[#7C5CFF]/30 font-semibold">
+            <span
+              className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border"
+              style={{
+                backgroundColor: 'var(--bg-elevated)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--accent-color)',
+              }}
+            >
               v2.0
             </span>
           </div>
         </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-4 relative">
+        <div className="flex items-center gap-3 relative">
           {/* Status Indicator Green Pulse Dot */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#13131A] border border-[#1E1E28] text-xs font-mono text-[#A0A0B0]">
+          <div
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-secondary)',
+            }}
+          >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]" />
@@ -124,12 +157,46 @@ export default function App() {
             <span>API Ready</span>
           </div>
 
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-105"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={theme}
+                initial={{ y: -10, opacity: 0, rotate: -45 }}
+                animate={{ y: 0, opacity: 1, rotate: 0 }}
+                exit={{ y: 10, opacity: 0, rotate: 45 }}
+                transition={{ duration: 0.15 }}
+                className="text-sm"
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </motion.span>
+            </AnimatePresence>
+            <span className="hidden sm:inline">
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </span>
+          </button>
+
+          {/* History Button */}
           <button
             onClick={() => {
               if (!isHistoryOpen) fetchHistory();
               setIsHistoryOpen(!isHistoryOpen);
             }}
-            className="text-xs font-semibold px-3.5 py-2 rounded-xl bg-[#13131A] text-[#A0A0B0] border border-[#1E1E28] hover:text-white hover:border-[#7C5CFF] transition-all cursor-pointer"
+            className="text-xs font-semibold px-3.5 py-2 rounded-xl border transition-all cursor-pointer shadow-sm hover:border-[var(--accent-color)]"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-secondary)',
+            }}
           >
             📜 History
           </button>
@@ -141,14 +208,24 @@ export default function App() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-0 top-12 w-80 rounded-2xl bg-[#13131A] border border-[#1E1E28] shadow-2xl p-3 z-50"
+                className="absolute right-0 top-12 w-80 rounded-2xl border shadow-2xl p-3 z-50"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-subtle)',
+                }}
               >
-                <div className="text-xs font-bold text-[#6B6B7B] uppercase tracking-wider px-2 py-1 border-b border-[#1E1E28] mb-2">
+                <div
+                  className="text-xs font-bold uppercase tracking-wider px-2 py-1 border-b mb-2"
+                  style={{
+                    color: 'var(--text-muted)',
+                    borderColor: 'var(--border-subtle)',
+                  }}
+                >
                   Recent Saved Plans
                 </div>
                 <div className="max-h-60 overflow-y-auto space-y-1">
                   {history.length === 0 ? (
-                    <div className="text-center py-4 text-xs text-[#6B6B7B]">
+                    <div className="text-center py-4 text-xs" style={{ color: 'var(--text-muted)' }}>
                       No previous plans found
                     </div>
                   ) : (
@@ -156,10 +233,14 @@ export default function App() {
                       <button
                         key={p.id}
                         onClick={() => loadProject(p.id)}
-                        className="w-full text-left p-2.5 rounded-xl text-xs hover:bg-[#1E1E28] transition-colors"
+                        className="w-full text-left p-2.5 rounded-xl text-xs transition-colors hover:bg-[var(--bg-elevated)] cursor-pointer"
                       >
-                        <div className="font-bold text-white mb-0.5">Plan #{p.id}</div>
-                        <div className="text-[#A0A0B0] truncate">{p.idea_text}</div>
+                        <div className="font-bold mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                          Plan #{p.id}
+                        </div>
+                        <div className="truncate" style={{ color: 'var(--text-secondary)' }}>
+                          {p.idea_text}
+                        </div>
                       </button>
                     ))
                   )}
@@ -180,7 +261,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
             >
               <PromptInput
                 onSubmit={handleGeneratePlan}
@@ -209,22 +290,33 @@ export default function App() {
               key="results"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
             >
               {/* Project Header Component */}
               <ProjectHeader project={projectData} onNewPlan={handleNewPlan} />
 
               {/* Tab Navigation */}
-              <div className="flex items-center gap-2 mb-6 p-1.5 bg-[#13131A] border border-[#1E1E28] rounded-2xl w-fit flex-wrap">
+              <div
+                className="flex items-center gap-2 mb-6 p-1.5 border rounded-2xl w-fit flex-wrap shadow-sm"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-subtle)',
+                }}
+              >
                 {TABS.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`text-xs font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
                       activeTab === tab.id
-                        ? 'bg-[#7C5CFF] text-white shadow-[0_0_15px_rgba(124,92,255,0.4)]'
-                        : 'text-[#A0A0B0] hover:text-white hover:bg-[#1E1E28]'
+                        ? 'gradient-bg text-white shadow-md'
+                        : 'hover:bg-[var(--bg-elevated)]'
                     }`}
+                    style={
+                      activeTab !== tab.id
+                        ? { color: 'var(--text-secondary)' }
+                        : {}
+                    }
                   >
                     <span>{tab.icon}</span>
                     <span>{tab.label}</span>
@@ -241,7 +333,7 @@ export default function App() {
                 )}
                 {activeTab === 'architecture' && (
                   <motion.div key="architecture" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <ArchitectureDiagram architecture={projectData.architecture} />
+                    <ArchitectureDiagram architecture={projectData.architecture} theme={theme} />
                   </motion.div>
                 )}
                 {activeTab === 'tasks' && (
@@ -265,12 +357,18 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-[#1E1E28] py-6 px-6 text-center text-xs text-[#6B6B7B]">
+      <footer
+        className="w-full border-t py-6 px-6 text-center text-xs"
+        style={{
+          borderColor: 'var(--border-subtle)',
+          color: 'var(--text-muted)',
+        }}
+      >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             © 2026 Prompt2Plan ⚡ AI-Powered Software Architecture & Project Planning
           </div>
-          <div className="flex items-center gap-4 text-[#A0A0B0]">
+          <div className="flex items-center gap-4" style={{ color: 'var(--text-secondary)' }}>
             <span>FastAPI + React 18</span>
             <span>•</span>
             <span>Mermaid.js</span>
@@ -282,3 +380,4 @@ export default function App() {
     </div>
   );
 }
+

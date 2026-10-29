@@ -19,7 +19,7 @@ from backend.rag_retrieval import initialize_rag, retrieve_similar
 from backend.knowledge_graph import initialize_kg, lookup_components
 from backend.architecture_gen import generate_architecture
 from backend.task_breakdown import break_into_tasks
-from backend.effort_estimation import estimate_effort
+from backend.ai_effort_estimator import estimate_effort, initialize_estimator, get_model_metrics
 from backend.milestone_scheduler import schedule_milestones
 from backend.cost_estimation import estimate_cloud_costs, analyze_project_risks
 from backend.exporter import generate_jira_csv, generate_github_csv, generate_html_report
@@ -50,6 +50,12 @@ def _async_init_bg():
         logger.info("✓ Knowledge graph loaded")
     except Exception as e:
         logger.error(f"✗ Knowledge graph loading failed: {e}")
+
+    try:
+        initialize_estimator()
+        logger.info("✓ AI Effort Estimator trained & ready")
+    except Exception as e:
+        logger.error(f"✗ AI Effort Estimator initialization failed: {e}")
 
 
 @asynccontextmanager
@@ -121,6 +127,10 @@ class TaskUpdateRequest(BaseModel):
     phase: str | None = None
     estimated_hours: float | None = None
     status: str | None = None
+
+
+class TaskActualHoursRequest(BaseModel):
+    actual_hours: float
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -236,6 +246,9 @@ async def get_project(project_id: int):
                 "component": t.component,
                 "phase": t.phase,
                 "estimated_hours": t.estimated_hours,
+                "optimistic_hours": round(t.estimated_hours * 0.75, 1),
+                "pessimistic_hours": round(t.estimated_hours * 1.35, 1),
+                "actual_hours": t.actual_hours,
                 "status": t.status,
             }
             for t in tasks_db
@@ -243,15 +256,26 @@ async def get_project(project_id: int):
 
         # Load milestones
         milestones_db = db.query(Milestone).filter(Milestone.project_id == project_id).all()
-        milestones = [
-            {
+        milestones = []
+        for m in milestones_db:
+            total_h = m.total_hours or 4.0
+            opt_h = m.optimistic_hours or round(total_h * 0.75, 1)
+            pess_h = m.pessimistic_hours or round(total_h * 1.35, 1)
+            total_d = max(1, round(total_h / 6.0))
+            opt_d = max(1, round(opt_h / 6.0))
+            pess_d = max(1, round(pess_h / 6.0))
+
+            milestones.append({
                 "phase_name": m.phase_name,
                 "start_day": m.start_day,
                 "end_day": m.end_day,
-                "total_hours": m.total_hours,
-            }
-            for m in milestones_db
-        ]
+                "total_hours": total_h,
+                "optimistic_hours": opt_h,
+                "pessimistic_hours": pess_h,
+                "total_days": total_d,
+                "optimistic_days": opt_d,
+                "pessimistic_days": pess_d,
+            })
 
         cost_estimate = estimate_cloud_costs(architecture)
         risk_analysis = analyze_project_risks({}, architecture, tasks)
@@ -521,6 +545,42 @@ async def delete_task(project_id: int, task_id: int):
     finally:
         db.close()
 
+@app.patch("/api/tasks/{task_id}/actual-hours")
+async def log_actual_hours(task_id: int, request: TaskActualHoursRequest):
+    """Log actual hours spent on a completed task for feedback training."""
+    db = SessionLocal()
+    try:
+        task = db.query(Task).filter(Task.id == task_id).first()
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found.")
+
+        task.actual_hours = request.actual_hours
+        task.status = "done"
+        db.commit()
+
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Logged {request.actual_hours} actual hours for task {task_id}",
+            "data": {
+                "id": task.id,
+                "name": task.name,
+                "estimated_hours": task.estimated_hours,
+                "actual_hours": task.actual_hours,
+                "status": task.status,
+            }
+        })
+    finally:
+        db.close()
+
+
+@app.get("/api/model-metrics")
+async def get_metrics():
+    """Retrieve held-out test evaluation metrics (MMRE and PRED(25))."""
+    metrics = get_model_metrics()
+    return JSONResponse(content={
+        "success": True,
+        "metrics": metrics,
+    })
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -547,12 +607,16 @@ def _save_to_db(idea_text: str, architecture: dict, tasks: list[dict], milestone
         # Save tasks
         saved_tasks = []
         for task in tasks:
+            est_h = task.get("estimated_hours", 4.0)
+            opt_h = task.get("optimistic_hours", round(est_h * 0.75, 1))
+            pess_h = task.get("pessimistic_hours", round(est_h * 1.35, 1))
+
             db_task = Task(
                 project_id=project.id,
                 name=task["name"],
                 component=task.get("component", ""),
                 phase=task.get("phase", _get_task_phase(task, milestones)),
-                estimated_hours=task.get("estimated_hours", 4.0),
+                estimated_hours=est_h,
                 status="todo",
             )
             db.add(db_task)
@@ -560,7 +624,9 @@ def _save_to_db(idea_text: str, architecture: dict, tasks: list[dict], milestone
                 "name": task["name"],
                 "component": task.get("component", ""),
                 "phase": db_task.phase,
-                "estimated_hours": task.get("estimated_hours", 4.0),
+                "estimated_hours": est_h,
+                "optimistic_hours": opt_h,
+                "pessimistic_hours": pess_h,
                 "status": "todo",
                 "type": task.get("type", "backend"),
             })
@@ -568,12 +634,18 @@ def _save_to_db(idea_text: str, architecture: dict, tasks: list[dict], milestone
         # Save milestones
         saved_milestones = []
         for ms in milestones:
+            tot_h = ms.get("total_hours", 0)
+            opt_h = ms.get("optimistic_hours", round(tot_h * 0.75, 1))
+            pess_h = ms.get("pessimistic_hours", round(tot_h * 1.35, 1))
+
             db_milestone = Milestone(
                 project_id=project.id,
                 phase_name=ms["phase_name"],
                 start_day=ms["start_day"],
                 end_day=ms["end_day"],
-                total_hours=ms.get("total_hours", 0),
+                total_hours=tot_h,
+                optimistic_hours=opt_h,
+                pessimistic_hours=pess_h,
             )
             db.add(db_milestone)
             saved_milestones.append({
@@ -581,8 +653,12 @@ def _save_to_db(idea_text: str, architecture: dict, tasks: list[dict], milestone
                 "description": ms.get("description", ""),
                 "start_day": ms["start_day"],
                 "end_day": ms["end_day"],
-                "total_hours": ms.get("total_hours", 0),
+                "total_hours": tot_h,
+                "optimistic_hours": opt_h,
+                "pessimistic_hours": pess_h,
                 "total_days": ms.get("total_days", 1),
+                "optimistic_days": ms.get("optimistic_days", max(1, round(opt_h / 6.0))),
+                "pessimistic_days": ms.get("pessimistic_days", max(1, round(pess_h / 6.0))),
                 "tasks": ms.get("tasks", []),
             })
 

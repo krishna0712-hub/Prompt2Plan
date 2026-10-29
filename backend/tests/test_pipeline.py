@@ -6,7 +6,7 @@ import asyncio
 
 from backend.nlp_extraction import _rule_based_extract
 from backend.knowledge_graph import lookup_components
-from backend.effort_estimation import estimate_effort
+from backend.ai_effort_estimator import estimate_effort, get_model_metrics
 from backend.cost_estimation import estimate_cloud_costs, analyze_project_risks
 
 
@@ -33,8 +33,8 @@ def test_knowledge_graph_lookup():
     assert any("auth" in n or "user" in n for n in comp_names)
 
 
-def test_effort_estimation():
-    """Test effort calculation multipliers."""
+def test_ai_effort_estimation():
+    """Test learned effort calculation with PERT range fields."""
     sample_tasks = [
         {"name": "Create database schema", "component": "User DB", "type": "database"},
         {"name": "Build login interface", "component": "Login UI", "type": "frontend"},
@@ -45,7 +45,14 @@ def test_effort_estimation():
     assert len(estimated) == 3
     for task in estimated:
         assert "estimated_hours" in task
+        assert "optimistic_hours" in task
+        assert "pessimistic_hours" in task
+        assert task["optimistic_hours"] <= task["estimated_hours"] <= task["pessimistic_hours"]
         assert task["estimated_hours"] > 0
+
+    metrics = get_model_metrics()
+    assert "mmre" in metrics
+    assert "pred_25" in metrics
 
 
 def test_cost_and_risk_estimation():

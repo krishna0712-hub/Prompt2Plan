@@ -70,9 +70,9 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
       <div className="text-center mb-6">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight">
           <span className="gradient-text block">Prompt in,</span>
-          <span className="text-white block">project plan out.</span>
+          <span className="block" style={{ color: 'var(--text-primary)' }}>project plan out.</span>
         </h1>
-        <p className="mt-4 text-base sm:text-lg text-[#A0A0B0] max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
           Describe your software idea in plain English. Get an architecture diagram,
           development task board, cloud costs, and milestone roadmap — instantly.
         </p>
@@ -85,7 +85,7 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/40 text-red-300 text-sm flex items-center justify-between"
+            className="w-full mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/40 text-red-500 text-sm flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">⚠️</span>
@@ -93,7 +93,7 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
             </div>
             <button
               onClick={onClearError}
-              className="text-red-400 hover:text-white text-xs px-2 py-1 rounded bg-red-500/20"
+              className="text-red-500 hover:underline text-xs px-2 py-1 rounded bg-red-500/20 cursor-pointer"
             >
               Dismiss
             </button>
@@ -105,7 +105,7 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
       <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
         {/* Quick Starters Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-          <span className="text-xs font-semibold text-[#6B6B7B] uppercase tracking-wider">
+          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
             Quick Starters:
           </span>
           {STARTERS.map((item) => (
@@ -113,7 +113,12 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
               key={item.label}
               type="button"
               onClick={() => handleSelectStarter(item.prompt)}
-              className="text-xs px-3.5 py-1.5 rounded-full bg-[#13131A] text-[#A0A0B0] border border-[#1E1E28] hover:border-[#7C5CFF] hover:text-white transition-all duration-200 cursor-pointer"
+              className="text-xs px-3.5 py-1.5 rounded-full border transition-all duration-200 cursor-pointer shadow-sm hover:border-[var(--accent-color)] hover:scale-105"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-secondary)',
+              }}
             >
               {item.label}
             </button>
@@ -130,9 +135,14 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
             placeholder={EXAMPLES[exampleIndex]}
             disabled={isLoading}
             rows={4}
-            className="w-full h-[140px] p-4 rounded-2xl bg-[#13131A] border border-[#1E1E28] text-white placeholder-[#6B6B7B] text-base outline-none resize-none transition-all duration-200 focus:border-[#7C5CFF] focus:ring-2 focus:ring-[#7C5CFF]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[140px] p-4 rounded-2xl border text-base outline-none resize-none transition-all duration-200 focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/30 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-primary)',
+            }}
           />
-          <div className="absolute bottom-3 right-4 text-xs font-mono text-[#6B6B7B]">
+          <div className="absolute bottom-3 right-4 text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
             {idea.length} chars
           </div>
         </div>
@@ -145,9 +155,14 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
           whileTap={idea.trim() && !isLoading ? { scale: 0.95 } : {}}
           className={`w-full mt-5 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg ${
             !idea.trim() || isLoading
-              ? 'bg-[#1E1E28] text-[#6B6B7B] cursor-not-allowed'
+              ? 'opacity-50 cursor-not-allowed'
               : 'gradient-bg text-white hover:brightness-110 gradient-glow cursor-pointer'
           }`}
+          style={
+            !idea.trim() || isLoading
+              ? { backgroundColor: 'var(--bg-elevated)', color: 'var(--text-muted)' }
+              : {}
+          }
         >
           {isLoading ? (
             <>
@@ -176,7 +191,12 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
         ].map((tag) => (
           <span
             key={tag}
-            className="text-xs px-3.5 py-1.5 rounded-full bg-[#13131A] text-[#6B6B7B] border border-[#1E1E28] font-medium"
+            className="text-xs px-3.5 py-1.5 rounded-full border font-medium shadow-sm"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-secondary)',
+            }}
           >
             {tag}
           </span>
@@ -185,3 +205,4 @@ export default function PromptInput({ onSubmit, isLoading, errorMessage, onClear
     </motion.div>
   );
 }
+

@@ -168,15 +168,19 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full bg-[#13131A] border border-[#1E1E28] rounded-2xl p-6 shadow-xl mb-8"
+      className="w-full border rounded-2xl p-6 shadow-xl mb-8"
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        borderColor: 'var(--border-subtle)',
+      }}
     >
       {/* Header Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#1E1E28]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <span>📋</span> Development Task Board
           </h3>
-          <p className="text-xs text-[#A0A0B0] mt-0.5">
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
             Kanban view grouped by phase with drag-and-drop support
           </p>
         </div>
@@ -187,7 +191,12 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
             placeholder="Filter tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="text-xs px-3.5 py-2 rounded-xl bg-[#0A0A0F] border border-[#1E1E28] text-white placeholder-[#6B6B7B] outline-none focus:border-[#7C5CFF]"
+            className="text-xs px-3.5 py-2 rounded-xl border outline-none focus:border-[var(--accent-color)] shadow-sm"
+            style={{
+              backgroundColor: 'var(--bg-base)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-primary)',
+            }}
           />
           {projectId && (
             <button
@@ -206,11 +215,20 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
           <button
             key={phase}
             onClick={() => setActivePhase(phase)}
-            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all cursor-pointer ${
               activePhase === phase
-                ? 'bg-[#7C5CFF] text-white shadow-[0_0_12px_rgba(124,92,255,0.4)]'
-                : 'bg-[#0A0A0F] text-[#A0A0B0] border border-[#1E1E28] hover:text-white'
+                ? 'gradient-bg text-white shadow-sm'
+                : 'border hover:border-[var(--accent-color)]'
             }`}
+            style={
+              activePhase !== phase
+                ? {
+                    backgroundColor: 'var(--bg-base)',
+                    borderColor: 'var(--border-subtle)',
+                    color: 'var(--text-secondary)',
+                  }
+                : {}
+            }
           >
             {phase === 'All' ? '🏷️ All Phases' : phase}
           </button>
@@ -225,17 +243,28 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
             return (
               <div
                 key={colId}
-                className="bg-[#0A0A0F] border border-[#1E1E28] rounded-xl flex flex-col min-h-[350px]"
+                className="border rounded-xl flex flex-col min-h-[350px] shadow-sm"
+                style={{
+                  backgroundColor: 'var(--bg-base)',
+                  borderColor: 'var(--border-subtle)',
+                }}
               >
                 {/* Column Header */}
-                <div className="p-4 border-b border-[#1E1E28] flex items-center justify-between">
+                <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div className="flex items-center gap-2">
                     <span>{colMeta.icon}</span>
                     <span className="font-semibold text-sm" style={{ color: colMeta.color }}>
                       {colMeta.title}
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#13131A] text-[#6B6B7B]">
+                  <span
+                    className="text-xs font-mono font-bold px-2 py-0.5 rounded-full border"
+                    style={{
+                      backgroundColor: 'var(--bg-surface)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
                     {colTasks.length}
                   </span>
                 </div>
@@ -247,7 +276,7 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className={`p-3 flex-1 transition-colors space-y-3 ${
-                        snapshot.isDraggingOver ? 'bg-[#7C5CFF]/10' : ''
+                        snapshot.isDraggingOver ? 'bg-[var(--accent-color)]/10' : ''
                       }`}
                     >
                       {colTasks.map((task, index) => {
@@ -259,36 +288,40 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className={`p-3 rounded-xl bg-[#13131A] border border-[#1E1E28] hover:border-[#7C5CFF] transition-all group relative cursor-grab active:cursor-grabbing ${
-                                  snapshot.isDragging ? 'scale-[1.02] shadow-[0_0_20px_rgba(124,92,255,0.4)] border-[#7C5CFF]' : ''
+                                className={`p-3.5 rounded-xl border transition-all group relative cursor-grab active:cursor-grabbing shadow-sm ${
+                                  snapshot.isDragging ? 'scale-[1.02] shadow-xl border-[var(--accent-color)]' : ''
                                 }`}
+                                style={{
+                                  backgroundColor: 'var(--bg-surface)',
+                                  borderColor: 'var(--border-subtle)',
+                                }}
                               >
                                 {/* Delete Button */}
                                 {projectId && task.id && (
                                   <button
                                     onClick={() => handleDeleteTask(task.id)}
-                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-xs px-1.5 py-0.5 rounded text-red-400 hover:bg-red-500/20 transition-all"
+                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-xs px-1.5 py-0.5 rounded text-red-500 hover:bg-red-500/20 transition-all cursor-pointer"
                                   >
                                     ✕
                                   </button>
                                 )}
 
                                 {/* Task Name */}
-                                <p className="text-sm font-semibold text-white leading-snug line-clamp-2 mb-2 pr-4">
+                                <p className="text-sm font-semibold leading-snug line-clamp-2 mb-2 pr-4" style={{ color: 'var(--text-primary)' }}>
                                   {task.name}
                                 </p>
 
                                 {/* Task Info Footer */}
-                                <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-[#1E1E28]/60">
-                                  <span className="text-[#6B6B7B] font-mono text-[11px] truncate max-w-[120px]">
+                                <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                                  <span className="font-mono text-[11px] truncate max-w-[120px]" style={{ color: 'var(--text-muted)' }}>
                                     {task.component || 'General'}
                                   </span>
                                   <div className="flex items-center gap-2">
-                                    <span className="font-mono text-[#A0A0B0] text-[11px]">
+                                    <span className="font-mono text-[11px]" style={{ color: 'var(--text-secondary)' }}>
                                       {task.estimated_hours || 4}h
                                     </span>
                                     {task.phase && (
-                                      <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-[#7C5CFF]/15 text-[#9B7BFF]">
+                                      <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-indigo-500/15 text-indigo-500 font-semibold border border-indigo-500/30">
                                         {task.phase.split(' ')[0]}
                                       </span>
                                     )}
@@ -302,7 +335,7 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
                       {provided.placeholder}
 
                       {colTasks.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-32 text-xs text-[#6B6B7B]">
+                        <div className="flex flex-col items-center justify-center h-32 text-xs" style={{ color: 'var(--text-muted)' }}>
                           <span>No tasks in this column</span>
                         </div>
                       )}
@@ -318,49 +351,68 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
       {/* Add Task Modal */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md p-6 rounded-2xl bg-[#13131A] border border-[#1E1E28] shadow-2xl"
+              className="w-full max-w-md p-6 rounded-2xl border shadow-2xl"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-subtle)',
+              }}
             >
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#1E1E28]">
-                <h4 className="font-bold text-white text-base">➕ Add Custom Task</h4>
-                <button onClick={() => setIsAddModalOpen(false)} className="text-sm text-[#6B6B7B] hover:text-white">✕</button>
+              <div className="flex items-center justify-between mb-4 pb-2 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                <h4 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>➕ Add Custom Task</h4>
+                <button onClick={() => setIsAddModalOpen(false)} className="text-sm cursor-pointer" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
 
               <form onSubmit={handleAddTask} className="space-y-4 text-xs">
                 <div>
-                  <label className="block mb-1 font-semibold text-[#A0A0B0]">Task Name *</label>
+                  <label className="block mb-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>Task Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g., Set up Redis cache cluster"
                     value={newTaskName}
                     onChange={(e) => setNewTaskName(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0A0A0F] border border-[#1E1E28] text-white outline-none focus:border-[#7C5CFF]"
+                    className="w-full p-3 rounded-xl border outline-none focus:border-[var(--accent-color)]"
+                    style={{
+                      backgroundColor: 'var(--bg-base)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block mb-1 font-semibold text-[#A0A0B0]">Component Name</label>
+                  <label className="block mb-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>Component Name</label>
                   <input
                     type="text"
                     placeholder="e.g., Cache Service"
                     value={newTaskComponent}
                     onChange={(e) => setNewTaskComponent(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0A0A0F] border border-[#1E1E28] text-white outline-none focus:border-[#7C5CFF]"
+                    className="w-full p-3 rounded-xl border outline-none focus:border-[var(--accent-color)]"
+                    style={{
+                      backgroundColor: 'var(--bg-base)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                    }}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block mb-1 font-semibold text-[#A0A0B0]">Phase</label>
+                    <label className="block mb-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>Phase</label>
                     <select
                       value={newTaskPhase}
                       onChange={(e) => setNewTaskPhase(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-[#0A0A0F] border border-[#1E1E28] text-white outline-none focus:border-[#7C5CFF]"
+                      className="w-full p-3 rounded-xl border outline-none focus:border-[var(--accent-color)]"
+                      style={{
+                        backgroundColor: 'var(--bg-base)',
+                        borderColor: 'var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
                     >
                       {PHASES.map((p) => (
                         <option key={p} value={p}>{p}</option>
@@ -369,7 +421,7 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
                   </div>
 
                   <div>
-                    <label className="block mb-1 font-semibold text-[#A0A0B0]">Estimated Hours</label>
+                    <label className="block mb-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>Estimated Hours</label>
                     <input
                       type="number"
                       min="1"
@@ -377,23 +429,33 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
                       step="0.5"
                       value={newTaskHours}
                       onChange={(e) => setNewTaskHours(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-[#0A0A0F] border border-[#1E1E28] text-white outline-none focus:border-[#7C5CFF]"
+                      className="w-full p-3 rounded-xl border outline-none focus:border-[var(--accent-color)]"
+                      style={{
+                        backgroundColor: 'var(--bg-base)',
+                        borderColor: 'var(--border-subtle)',
+                        color: 'var(--text-primary)',
+                      }}
                     />
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-[#1E1E28]">
+                <div className="flex justify-end gap-2 pt-3 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl border border-[#1E1E28] text-[#A0A0B0] font-semibold hover:text-white"
+                    className="px-4 py-2.5 rounded-xl border font-semibold cursor-pointer"
+                    style={{
+                      backgroundColor: 'var(--bg-base)',
+                      borderColor: 'var(--border-subtle)',
+                      color: 'var(--text-secondary)',
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2.5 rounded-xl font-bold gradient-bg text-white shadow-md hover:brightness-110"
+                    className="px-4 py-2.5 rounded-xl font-bold gradient-bg text-white shadow-md hover:brightness-110 cursor-pointer"
                   >
                     {isSubmitting ? 'Saving...' : 'Add Task'}
                   </button>
@@ -406,3 +468,4 @@ export default function TaskBoard({ projectId, tasks, onUpdateResult }) {
     </motion.div>
   );
 }
+

@@ -27,11 +27,13 @@ const TYPE_COLORS = {
   cache: '#EC4899',
 };
 
-export default function ArchitectureDiagram({ architecture }) {
+export default function ArchitectureDiagram({ architecture, theme = 'dark' }) {
   const containerRef = useRef(null);
   const [layoutDirection, setLayoutDirection] = useState('TD'); // 'TD' or 'LR'
   const [renderError, setRenderError] = useState(false);
   const [svgContent, setSvgContent] = useState('');
+
+  const isDark = theme === 'dark';
 
   const buildMermaidString = (arch, direction) => {
     if (!arch || !arch.components || arch.components.length === 0) {
@@ -40,12 +42,16 @@ export default function ArchitectureDiagram({ architecture }) {
 
     let code = `graph ${direction}\n`;
 
+    const subColor = isDark ? '#A0A0B0' : '#475569';
+    const textColor = isDark ? '#FFFFFF' : '#0F172A';
+    const nodeBg = isDark ? '#13131A' : '#FFFFFF';
+
     // Define nodes
     arch.components.forEach((comp) => {
       const cleanId = comp.id.replace(/[^a-zA-Z0-9_]/g, '_');
       const cleanName = comp.name.replace(/"/g, "'");
       const compType = (comp.type || 'backend').toLowerCase();
-      code += `  ${cleanId}["${cleanName}<br/><sub style='font-size:10px;color:#A0A0B0;'>[${compType}]</sub>"]\n`;
+      code += `  ${cleanId}["${cleanName}<br/><sub style='font-size:10px;color:${subColor};'>[${compType}]</sub>"]\n`;
     });
 
     // Define connections
@@ -64,8 +70,8 @@ export default function ArchitectureDiagram({ architecture }) {
     arch.components.forEach((comp) => {
       const cleanId = comp.id.replace(/[^a-zA-Z0-9_]/g, '_');
       const type = (comp.type || 'backend').toLowerCase();
-      const color = TYPE_COLORS[type] || '#7C5CFF';
-      code += `  style ${cleanId} fill:#13131A,stroke:${color},stroke-width:2px,color:#FFFFFF\n`;
+      const color = TYPE_COLORS[type] || (isDark ? '#7C5CFF' : '#6366F1');
+      code += `  style ${cleanId} fill:${nodeBg},stroke:${color},stroke-width:2px,color:${textColor}\n`;
     });
 
     return code;
@@ -77,6 +83,37 @@ export default function ArchitectureDiagram({ architecture }) {
 
     if (!architecture || !architecture.components || architecture.components.length === 0) {
       return;
+    }
+
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        themeVariables: isDark
+          ? {
+              darkMode: true,
+              background: '#13131A',
+              primaryColor: '#7C5CFF',
+              primaryTextColor: '#FFFFFF',
+              primaryBorderColor: '#1E1E28',
+              lineColor: '#6B6B7B',
+              secondaryColor: '#10B981',
+              tertiaryColor: '#F59E0B',
+            }
+          : {
+              darkMode: false,
+              background: '#FFFFFF',
+              primaryColor: '#6366F1',
+              primaryTextColor: '#0F172A',
+              primaryBorderColor: '#E2E8F0',
+              lineColor: '#94A3B8',
+              secondaryColor: '#10B981',
+              tertiaryColor: '#F59E0B',
+            },
+        securityLevel: 'loose',
+      });
+    } catch (e) {
+      console.warn('Mermaid re-init:', e);
     }
 
     const renderDiagram = async () => {
@@ -103,11 +140,18 @@ export default function ArchitectureDiagram({ architecture }) {
     return () => {
       isMounted = false;
     };
-  }, [architecture, layoutDirection]);
+  }, [architecture, layoutDirection, theme]);
 
   if (!architecture || !architecture.components || architecture.components.length === 0) {
     return (
-      <div className="w-full bg-[#13131A] border border-[#1E1E28] rounded-2xl p-12 text-center text-[#6B6B7B]">
+      <div
+        className="w-full border rounded-2xl p-12 text-center"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+          color: 'var(--text-muted)',
+        }}
+      >
         <span className="text-3xl block mb-2">🏗️</span>
         <p className="text-sm font-medium">No architecture data available</p>
       </div>
@@ -119,15 +163,19 @@ export default function ArchitectureDiagram({ architecture }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full bg-[#13131A] border border-[#1E1E28] rounded-2xl p-6 shadow-xl mb-8"
+      className="w-full border rounded-2xl p-6 shadow-xl mb-8"
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        borderColor: 'var(--border-subtle)',
+      }}
     >
       {/* Header & Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#1E1E28]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <span>🏗️</span> System Architecture
           </h3>
-          <p className="text-xs text-[#A0A0B0] mt-0.5">
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
             Auto-generated interactive component relationship diagram
           </p>
         </div>
@@ -136,21 +184,23 @@ export default function ArchitectureDiagram({ architecture }) {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setLayoutDirection('TD')}
-            className={`text-xs px-3 py-1.5 rounded-lg font-mono font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-lg font-mono font-medium transition-all cursor-pointer ${
               layoutDirection === 'TD'
-                ? 'bg-[#7C5CFF] text-white'
-                : 'bg-[#1E1E28] text-[#A0A0B0] hover:text-white'
+                ? 'gradient-bg text-white shadow-sm'
+                : 'hover:bg-[var(--bg-elevated)]'
             }`}
+            style={layoutDirection !== 'TD' ? { backgroundColor: 'var(--bg-elevated)', color: 'var(--text-secondary)' } : {}}
           >
             Top-Down (TD)
           </button>
           <button
             onClick={() => setLayoutDirection('LR')}
-            className={`text-xs px-3 py-1.5 rounded-lg font-mono font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-lg font-mono font-medium transition-all cursor-pointer ${
               layoutDirection === 'LR'
-                ? 'bg-[#7C5CFF] text-white'
-                : 'bg-[#1E1E28] text-[#A0A0B0] hover:text-white'
+                ? 'gradient-bg text-white shadow-sm'
+                : 'hover:bg-[var(--bg-elevated)]'
             }`}
+            style={layoutDirection !== 'LR' ? { backgroundColor: 'var(--bg-elevated)', color: 'var(--text-secondary)' } : {}}
           >
             Left-Right (LR)
           </button>
@@ -158,19 +208,25 @@ export default function ArchitectureDiagram({ architecture }) {
       </div>
 
       {/* Color Legend */}
-      <div className="flex flex-wrap items-center gap-4 mb-6 px-4 py-2.5 rounded-xl bg-[#0A0A0F] border border-[#1E1E28]">
-        <span className="text-xs font-semibold text-[#6B6B7B] uppercase tracking-wider">Legend:</span>
+      <div
+        className="flex flex-wrap items-center gap-4 mb-6 px-4 py-2.5 rounded-xl border shadow-sm"
+        style={{
+          backgroundColor: 'var(--bg-base)',
+          borderColor: 'var(--border-subtle)',
+        }}
+      >
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Legend:</span>
         {Object.entries(TYPE_COLORS).map(([type, color]) => (
           <div key={type} className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-xs text-[#A0A0B0] capitalize font-mono">{type}</span>
+            <span className="text-xs capitalize font-mono" style={{ color: 'var(--text-secondary)' }}>{type}</span>
           </div>
         ))}
       </div>
 
       {/* Render Area */}
       {renderError ? (
-        <div className="p-8 text-center text-red-400 bg-red-500/10 rounded-xl border border-red-500/30 text-sm">
+        <div className="p-8 text-center text-red-500 bg-red-500/10 rounded-xl border border-red-500/30 text-sm">
           ⚠️ Failed to render architecture diagram. Check component schema.
         </div>
       ) : (
@@ -183,3 +239,4 @@ export default function ArchitectureDiagram({ architecture }) {
     </motion.div>
   );
 }
+
