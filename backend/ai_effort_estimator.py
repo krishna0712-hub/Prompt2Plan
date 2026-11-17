@@ -1,33 +1,38 @@
 """
 ai_effort_estimator.py — Learned AI Effort Estimator for Prompt2Plan
 
-Replaces heuristic effort estimation with a data-driven ensemble of:
-1. Retrieval Estimator (k-NN FAISS search over historical PROMISE repository software tasks,
-   using sentence-transformers embeddings all-MiniLM-L6-v2)
-2. Regression Estimator (scikit-learn GradientBoostingRegressor trained on embeddings & task features)
-3. PERT-style Range Output (Optimistic / Most-Likely / Pessimistic hours)
-
-All estimates trace back strictly to historical empirical data.
+Memory-optimized implementation:
+- Reuses shared singleton EmbeddingManager (lazy loaded, zero duplicate model instances).
+- Reuses precomputed dataset embeddings (cocomo81_embeddings.npy) to avoid startup re-embedding.
+- Batch encodes tasks in a single forward pass, eliminating 2*N duplicate neural network calls.
+- Reuses single embedding vector across retrieval estimator and regression estimator.
+- Thread-safe lazy initialization with locking.
+- Preserves exact ensemble methodology: FAISS k-NN retrieval + GradientBoostingRegressor + PERT spread.
 """
 
 import os
+import gc
 import csv
-import numpy as np
 import logging
-from typing import List, Dict, Any, Tuple
+import threading
+from typing import List, Dict, Any, Tuple, Optional
+import numpy as np
+
+from backend.embedding_manager import get_embedding_manager
 
 logger = logging.getLogger(__name__)
 
 # Paths
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "data", "cocomo81.csv")
+EMBEDDINGS_PATH = os.path.join(os.path.dirname(__file__), "data", "cocomo81_embeddings.npy")
 
-# Module-level state loaded/trained at startup
-_model = None  # SentenceTransformer instance
+# Module-level state loaded/trained lazily
 _faiss_index = None  # FAISS index for vector search
 _dataset_records: List[Dict[str, Any]] = []
 _regressor = None  # GradientBoostingRegressor instance
 _metrics_cache: Dict[str, Any] = {}
 _initialized = False
+_estimator_lock = threading.Lock()
 
 
 def _ensure_dataset_exists():
@@ -38,7 +43,6 @@ def _ensure_dataset_exists():
     os.makedirs(os.path.dirname(DATASET_PATH), exist_ok=True)
     logger.info(f"Dataset not found at {DATASET_PATH}, creating default historical PROMISE dataset...")
 
-    # Default PROMISE historical task records
     default_records = [
         ("COCOMO_P1", "Project scaffolding initial environment setup build script and dependency configuration", "setup", "Infrastructure", 6.9, 0.8, 8.5),
         ("COCOMO_P2", "Database schema migration seed data and user model setup", "setup", "Database", 16.0, 1.0, 14.0),
@@ -99,103 +103,122 @@ def load_dataset() -> List[Dict[str, Any]]:
     return records
 
 
-def initialize_estimator():
+def initialize_estimator(force_recompute: bool = False):
     """
-    Load embedding model, build FAISS index for retrieval estimator,
-    train GradientBoostingRegressor, and compute held-out test evaluation metrics.
+    Lazy thread-safe initialization of effort estimation components:
+    - Loads historical dataset
+    - Loads or computes task embeddings with shared EmbeddingManager
+    - Builds FAISS index for retrieval estimator
+    - Trains GradientBoostingRegressor
+    - Calculates evaluation metrics (MMRE and PRED(25))
     """
-    global _model, _faiss_index, _dataset_records, _regressor, _metrics_cache, _initialized
+    global _faiss_index, _dataset_records, _regressor, _metrics_cache, _initialized
 
-    _dataset_records = load_dataset()
-    logger.info(f"Loaded {len(_dataset_records)} historical task records from {DATASET_PATH}")
+    with _estimator_lock:
+        if _initialized and not force_recompute:
+            return
 
-    # Load SentenceTransformer model
-    try:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-        logger.info("SentenceTransformer model (all-MiniLM-L6-v2) loaded successfully.")
-    except Exception as e:
-        logger.error(f"Failed to load SentenceTransformer: {e}")
-        _model = None
+        _dataset_records = load_dataset()
+        logger.info(f"Loaded {len(_dataset_records)} historical task records from {DATASET_PATH}")
 
-    # Embed task descriptions
-    descriptions = [r["task_description"] for r in _dataset_records]
-    actual_hours = np.array([r["actual_hours"] for r in _dataset_records], dtype=np.float32)
+        # Check for precomputed embeddings
+        embeddings = None
+        if os.path.exists(EMBEDDINGS_PATH) and not force_recompute:
+            try:
+                embeddings = np.load(EMBEDDINGS_PATH).astype(np.float32)
+                if len(embeddings) != len(_dataset_records):
+                    logger.warning("Precomputed embeddings row count mismatch. Recomputing...")
+                    embeddings = None
+                else:
+                    logger.info(f"Loaded precomputed task embeddings from {EMBEDDINGS_PATH} (shape: {embeddings.shape})")
+            except Exception as e:
+                logger.warning(f"Failed to read precomputed task embeddings: {e}")
+                embeddings = None
 
-    embeddings = None
-    if _model is not None:
-        try:
-            embeddings = _model.encode(descriptions, convert_to_numpy=True, show_progress_bar=False)
-        except Exception as e:
-            logger.error(f"Error encoding dataset descriptions: {e}")
+        descriptions = [r["task_description"] for r in _dataset_records]
+        actual_hours = np.array([r["actual_hours"] for r in _dataset_records], dtype=np.float32)
 
-    # Build FAISS Index
-    if embeddings is not None:
-        try:
-            import faiss
-            dim = embeddings.shape[1]
-            # Normalize vectors for cosine similarity
-            faiss.normalize_L2(embeddings.astype(np.float32))
-            _faiss_index = faiss.IndexFlatIP(dim)  # Inner Product on L2-normalized vectors = Cosine Similarity
-            _faiss_index.add(embeddings.astype(np.float32))
-            logger.info(f"FAISS index created with {_faiss_index.ntotal} vectors (dim={dim})")
-        except Exception as e:
-            logger.error(f"Failed to build FAISS index: {e}")
-            _faiss_index = None
+        # Generate embeddings if not available from precomputed cache
+        if embeddings is None:
+            try:
+                em = get_embedding_manager()
+                embeddings = em.encode(descriptions, show_progress_bar=False).astype(np.float32)
+                try:
+                    np.save(EMBEDDINGS_PATH, embeddings)
+                    logger.info(f"Saved precomputed task embeddings to {EMBEDDINGS_PATH}")
+                except Exception as save_err:
+                    logger.warning(f"Could not cache task embeddings: {save_err}")
+            except Exception as e:
+                logger.error(f"Error encoding dataset descriptions: {e}")
+                embeddings = None
 
-    # Train GradientBoostingRegressor & compute evaluation metrics
-    try:
-        from sklearn.ensemble import GradientBoostingRegressor
-        from sklearn.model_selection import train_test_split
-
+        # Build FAISS Index for cosine similarity search (IndexFlatIP on normalized vectors)
         if embeddings is not None:
-            X = embeddings
-        else:
-            # Fallback simple feature matrix
-            X = np.array([[r["loc_ksloc"], r["complexity"]] for r in _dataset_records])
+            try:
+                import faiss
 
-        y = actual_hours
+                dim = embeddings.shape[1]
+                # Normalize copy of vectors for cosine similarity
+                norm_embeddings = embeddings.copy()
+                faiss.normalize_L2(norm_embeddings)
+                _faiss_index = faiss.IndexFlatIP(dim)
+                _faiss_index.add(norm_embeddings.astype(np.float32))
+                logger.info(f"FAISS index created with {_faiss_index.ntotal} vectors (dim={dim})")
+            except Exception as e:
+                logger.error(f"Failed to build FAISS index: {e}")
+                _faiss_index = None
 
-        # Train-test split (80-20) for held-out evaluation
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Train GradientBoostingRegressor & compute held-out evaluation metrics
+        try:
+            from sklearn.ensemble import GradientBoostingRegressor
+            from sklearn.model_selection import train_test_split
 
-        _regressor = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
-        _regressor.fit(X_train, y_train)
+            if embeddings is not None:
+                X = embeddings
+            else:
+                X = np.array([[r["loc_ksloc"], r["complexity"]] for r in _dataset_records])
 
-        # Evaluate on held-out test split
-        y_pred = _regressor.predict(X_test)
-        
-        # Calculate MRE for each test sample: |actual - predicted| / actual
-        mre = np.abs(y_test - y_pred) / np.maximum(y_test, 1e-5)
-        mmre = float(np.mean(mre))
-        pred_25 = float(np.mean(mre <= 0.25) * 100.0)
+            y = actual_hours
 
-        _metrics_cache = {
-            "mmre": round(mmre, 4),
-            "pred_25": round(pred_25, 2),
-            "test_samples": int(len(y_test)),
-            "total_training_records": int(len(_dataset_records)),
-            "dataset_name": "PROMISE Software Engineering Repository (COCOMO81 / Desharnais)",
-            "model_type": "Ensemble (FAISS k-NN Retrieval + GradientBoostingRegressor)",
-        }
-        logger.info(f"Model trained. Evaluation metrics — MMRE: {_metrics_cache['mmre']}, PRED(25): {_metrics_cache['pred_25']}%")
+            # Train-test split (80-20) for held-out evaluation
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Re-fit regressor on full dataset for maximum performance in production
-        _regressor.fit(X, y)
+            _regressor = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+            _regressor.fit(X_train, y_train)
 
-    except Exception as e:
-        logger.error(f"Failed to train GradientBoostingRegressor: {e}", exc_info=True)
-        _regressor = None
-        _metrics_cache = {
-            "mmre": 0.185,
-            "pred_25": 82.5,
-            "test_samples": 12,
-            "total_training_records": len(_dataset_records),
-            "dataset_name": "PROMISE Software Engineering Repository (COCOMO81 / Desharnais)",
-            "model_type": "Ensemble (FAISS k-NN Retrieval + GradientBoostingRegressor)",
-        }
+            # Evaluate on held-out test split
+            y_pred = _regressor.predict(X_test)
+            mre = np.abs(y_test - y_pred) / np.maximum(y_test, 1e-5)
+            mmre = float(np.mean(mre))
+            pred_25 = float(np.mean(mre <= 0.25) * 100.0)
 
-    _initialized = True
+            _metrics_cache = {
+                "mmre": round(mmre, 4),
+                "pred_25": round(pred_25, 2),
+                "test_samples": int(len(y_test)),
+                "total_training_records": int(len(_dataset_records)),
+                "dataset_name": "PROMISE Software Engineering Repository (COCOMO81 / Desharnais)",
+                "model_type": "Ensemble (FAISS k-NN Retrieval + GradientBoostingRegressor)",
+            }
+            logger.info(f"Model trained. Evaluation metrics — MMRE: {_metrics_cache['mmre']}, PRED(25): {_metrics_cache['pred_25']}%")
+
+            # Re-fit regressor on full dataset for maximum accuracy in production
+            _regressor.fit(X, y)
+
+        except Exception as e:
+            logger.error(f"Failed to train GradientBoostingRegressor: {e}", exc_info=True)
+            _regressor = None
+            _metrics_cache = {
+                "mmre": 0.185,
+                "pred_25": 82.5,
+                "test_samples": 12,
+                "total_training_records": len(_dataset_records),
+                "dataset_name": "PROMISE Software Engineering Repository (COCOMO81 / Desharnais)",
+                "model_type": "Ensemble (FAISS k-NN Retrieval + GradientBoostingRegressor)",
+            }
+
+        _initialized = True
+        gc.collect()
 
 
 def _get_task_text(task: Dict[str, Any]) -> str:
@@ -206,24 +229,32 @@ def _get_task_text(task: Dict[str, Any]) -> str:
     return f"{name} in component {comp} for {task_type} development"
 
 
-def predict_retrieval(task_text: str, k: int = 5) -> Tuple[float, List[float]]:
+def predict_retrieval(task_text: str, k: int = 5, query_vec: Optional[np.ndarray] = None) -> Tuple[float, List[float]]:
     """
-    Retrieval estimator: embed task description, FAISS search top-k nearest past tasks,
-    and return weighted average of actual recorded efforts alongside the neighbor spread.
+    Retrieval estimator: FAISS search top-k nearest past tasks,
+    and return weighted average of actual recorded efforts alongside neighbor spread.
+    Reuses precomputed query_vec when supplied.
     """
-    if _faiss_index is None or _model is None or not _dataset_records:
-        # Fallback values from dataset mean/median if search unavailable
+    if not _initialized:
+        initialize_estimator()
+
+    if _faiss_index is None or not _dataset_records:
         hours = [r["actual_hours"] for r in _dataset_records] if _dataset_records else [12.0]
         avg_hours = float(np.mean(hours))
         return avg_hours, hours[:k]
 
     try:
         import faiss
-        query_vec = _model.encode([task_text], convert_to_numpy=True).astype(np.float32)
-        faiss.normalize_L2(query_vec)
+
+        if query_vec is None:
+            em = get_embedding_manager()
+            query_vec = em.encode(task_text)
+
+        vec = query_vec.copy().reshape(1, -1).astype(np.float32)
+        faiss.normalize_L2(vec)
 
         k_neighbors = min(k, len(_dataset_records))
-        similarities, indices = _faiss_index.search(query_vec, k_neighbors)
+        similarities, indices = _faiss_index.search(vec, k_neighbors)
 
         neighbor_hours = []
         weights = []
@@ -232,7 +263,6 @@ def predict_retrieval(task_text: str, k: int = 5) -> Tuple[float, List[float]]:
             if 0 <= idx < len(_dataset_records):
                 h = _dataset_records[idx]["actual_hours"]
                 neighbor_hours.append(h)
-                # Softmax or similarity weighting
                 w = max(0.01, float(sim + 1.0))
                 weights.append(w)
 
@@ -248,17 +278,24 @@ def predict_retrieval(task_text: str, k: int = 5) -> Tuple[float, List[float]]:
         return 12.0, [10.0, 12.0, 14.0]
 
 
-def predict_regression(task_text: str) -> float:
-    """Regression estimator: use trained GradientBoostingRegressor to independently predict effort."""
+def predict_regression(task_text: str, query_vec: Optional[np.ndarray] = None) -> float:
+    """
+    Regression estimator: use trained GradientBoostingRegressor to predict effort.
+    Reuses precomputed query_vec when supplied.
+    """
+    if not _initialized:
+        initialize_estimator()
+
     if _regressor is None:
         return 12.0
 
     try:
-        if _model is not None:
-            vec = _model.encode([task_text], convert_to_numpy=True)
-            pred = float(_regressor.predict(vec)[0])
-        else:
-            pred = 12.0
+        if query_vec is None:
+            em = get_embedding_manager()
+            query_vec = em.encode(task_text)
+
+        vec = query_vec.reshape(1, -1).astype(np.float32)
+        pred = float(_regressor.predict(vec)[0])
         return max(2.0, pred)
     except Exception as e:
         logger.error(f"Regression prediction error: {e}")
@@ -270,28 +307,39 @@ def estimate_effort(tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Estimate effort for a list of tasks using ensemble retrieval + regression.
     Outputs PERT range (optimistic, likely, pessimistic) per task.
 
-    Args:
-        tasks: List of task dicts.
-
-    Returns:
-        Updated list of tasks with:
-        - estimated_hours (likely)
-        - optimistic_hours
-        - pessimistic_hours
+    Memory & Speed Optimization:
+    - Batch encodes all task descriptions in a single model forward pass.
+    - Reuses each embedding vector for both retrieval and regression estimators.
     """
+    if not tasks:
+        return []
+
     if not _initialized:
         initialize_estimator()
 
-    for task in tasks:
-        task_text = _get_task_text(task)
+    # 1. Batch format task texts
+    task_texts = [_get_task_text(task) for task in tasks]
 
-        # 1. Retrieval prediction + neighbor spread
-        retrieval_est, neighbor_hours = predict_retrieval(task_text, k=5)
+    # 2. Batch encode all tasks at once via shared EmbeddingManager
+    em = get_embedding_manager()
+    task_vectors = em.encode(task_texts)
 
-        # 2. Regression prediction
-        regression_est = predict_regression(task_text)
+    # Handle single vs batch array return shape
+    if task_vectors.ndim == 1:
+        task_vectors = task_vectors.reshape(1, -1)
 
-        # 3. Ensemble (simple average of retrieval and regression)
+    # 3. Estimate each task reusing its computed vector
+    for idx, task in enumerate(tasks):
+        vec = task_vectors[idx]
+        task_text = task_texts[idx]
+
+        # 1. Retrieval prediction + neighbor spread (using precomputed vec)
+        retrieval_est, neighbor_hours = predict_retrieval(task_text, k=5, query_vec=vec)
+
+        # 2. Regression prediction (using precomputed vec)
+        regression_est = predict_regression(task_text, query_vec=vec)
+
+        # 3. Ensemble (average of retrieval and regression)
         likely_hours = round(0.5 * retrieval_est + 0.5 * regression_est, 1)
         likely_hours = max(2.0, min(80.0, likely_hours))
 

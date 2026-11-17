@@ -1,92 +1,156 @@
 """
-rag_retrieval.py — Step 2: FAISS similarity search over seed templates
-Embeds seed template descriptions with sentence-transformers (all-MiniLM-L6-v2),
-builds a FAISS index in memory, and retrieves top-k similar architectures.
+rag_retrieval.py — Step 2: FAISS similarity search over seed templates.
+
+Memory-optimized implementation:
+- Uses shared singleton EmbeddingManager (lazy loaded).
+- Reuses precomputed template embeddings (seed_templates_embeddings.npy) to avoid startup re-embedding.
+- Preserves exact FAISS vector similarity search and top-k retrieval quality.
+- Thread-safe lazy initialization.
+- In-memory LRU query cache to eliminate duplicate neural forward passes.
 """
 import os
+import gc
 import json
 import logging
+import threading
+from typing import List, Dict, Any, Optional
 import numpy as np
+
+from backend.embedding_manager import get_embedding_manager
 
 logger = logging.getLogger(__name__)
 
-# Module-level state — initialized once at startup
+# Module-level state — lazily initialized
 _faiss_index = None
-_seed_templates = []
-_model = None
+_seed_templates: List[Dict[str, Any]] = []
+_rag_lock = threading.Lock()
+_query_cache: Dict[str, List[Dict[str, Any]]] = {}
+_cache_lock = threading.Lock()
+MAX_RAG_CACHE = 128
 
 
-def initialize_rag():
+def initialize_rag(force_recompute: bool = False):
     """
-    Load seed templates, embed them, and build the FAISS index.
-    Called once at application startup.
+    Load seed templates, retrieve/compute embeddings, and build the FAISS index.
+    Thread-safe and lazy: can be called at startup or on first request.
     """
-    global _faiss_index, _seed_templates, _model
+    global _faiss_index, _seed_templates
 
-    # Load seed templates
-    data_path = os.path.join(os.path.dirname(__file__), "data", "seed_templates.json")
-    with open(data_path, "r", encoding="utf-8") as f:
-        _seed_templates = json.load(f)
+    with _rag_lock:
+        if _faiss_index is not None and _seed_templates and not force_recompute:
+            return
 
-    logger.info(f"Loaded {len(_seed_templates)} seed templates")
+        # 1. Load seed templates JSON
+        data_path = os.path.join(os.path.dirname(__file__), "data", "seed_templates.json")
+        try:
+            with open(data_path, "r", encoding="utf-8") as f:
+                _seed_templates = json.load(f)
+            logger.info(f"Loaded {len(_seed_templates)} seed templates")
+        except Exception as e:
+            logger.error(f"Failed to load seed templates from {data_path}: {e}")
+            _seed_templates = []
+            _faiss_index = None
+            return
 
-    # Load the sentence-transformer model
-    try:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-        logger.info("Sentence-transformer model loaded (all-MiniLM-L6-v2)")
-    except Exception as e:
-        logger.error(f"Failed to load sentence-transformer model: {e}")
-        logger.warning("RAG retrieval will return random templates as fallback")
-        _model = None
-        return
+        # 2. Check for precomputed embeddings to avoid loading embedding model into memory at startup
+        npy_path = os.path.join(os.path.dirname(__file__), "data", "seed_templates_embeddings.npy")
+        embeddings = None
 
-    # Embed all template descriptions
-    descriptions = [t["description"] for t in _seed_templates]
-    embeddings = _model.encode(descriptions, convert_to_numpy=True, show_progress_bar=False)
+        if os.path.exists(npy_path) and not force_recompute:
+            try:
+                embeddings = np.load(npy_path).astype(np.float32)
+                if len(embeddings) != len(_seed_templates):
+                    logger.warning("Precomputed embeddings count mismatch with templates. Recomputing...")
+                    embeddings = None
+                else:
+                    logger.info(f"Loaded precomputed seed template embeddings from {npy_path} (shape: {embeddings.shape})")
+            except Exception as e:
+                logger.warning(f"Failed to read precomputed embeddings: {e}. Falling back to dynamic embedding.")
+                embeddings = None
 
-    # Build FAISS index
-    try:
-        import faiss
+        # 3. Generate embeddings with shared model if not loaded from precomputed cache
+        if embeddings is None:
+            try:
+                em = get_embedding_manager()
+                descriptions = [t["description"] for t in _seed_templates]
+                embeddings = em.encode(descriptions, show_progress_bar=False).astype(np.float32)
+                # Persist to disk for future zero-cost startups
+                try:
+                    np.save(npy_path, embeddings)
+                    logger.info(f"Saved precomputed seed template embeddings to {npy_path}")
+                except Exception as save_err:
+                    logger.warning(f"Could not cache embeddings to disk: {save_err}")
+            except Exception as e:
+                logger.error(f"Failed to compute seed template embeddings: {e}")
+                _faiss_index = None
+                return
 
-        dimension = embeddings.shape[1]
-        _faiss_index = faiss.IndexFlatL2(dimension)
-        _faiss_index.add(embeddings.astype(np.float32))
-        logger.info(f"FAISS index built with {_faiss_index.ntotal} vectors (dim={dimension})")
-    except Exception as e:
-        logger.error(f"Failed to build FAISS index: {e}")
-        _faiss_index = None
+        # 4. Build FAISS index
+        try:
+            import faiss
+
+            dimension = embeddings.shape[1]
+            # Use IndexFlatL2 for exact Euclidean distance matching (same as baseline)
+            index = faiss.IndexFlatL2(dimension)
+            index.add(embeddings.astype(np.float32))
+            _faiss_index = index
+            logger.info(f"FAISS index built with {_faiss_index.ntotal} vectors (dim={dimension})")
+        except Exception as e:
+            logger.error(f"Failed to build FAISS index: {e}")
+            _faiss_index = None
+
+        gc.collect()
 
 
-def retrieve_similar(features: list[str], top_k: int = 3) -> list[dict]:
+def retrieve_similar(features: List[str], top_k: int = 3) -> List[Dict[str, Any]]:
     """
     Find the top-k most similar seed templates to the given features.
+    Preserves exact semantic search relevance and ranking behavior.
 
     Args:
         features: List of feature keywords extracted from the user's idea.
-        top_k: Number of similar templates to return.
+        top_k: Number of similar templates to return (default: 3).
 
     Returns:
         List of architecture dicts from the most similar seed templates.
     """
-    if not _seed_templates:
+    if not features:
+        return []
+
+    # Check in-memory query cache for instant retrieval without re-encoding
+    cache_key = f"{','.join(sorted(features))}_{top_k}"
+    with _cache_lock:
+        if cache_key in _query_cache:
+            return _query_cache[cache_key]
+
+    if not _seed_templates or _faiss_index is None:
         initialize_rag()
+
     if not _seed_templates:
         logger.warning("No seed templates loaded — returning empty results")
         return []
 
-    # If FAISS or model not available, return random templates as fallback
-    if _faiss_index is None or _model is None:
-        logger.warning("FAISS/model not available — returning first {top_k} templates")
-        return [t["architecture"] for t in _seed_templates[:top_k]]
+    # If FAISS not available, return first top_k templates as fallback
+    if _faiss_index is None:
+        logger.warning(f"FAISS index unavailable — returning first {top_k} templates")
+        fallback = [
+            {
+                "id": t["id"],
+                "description": t["description"],
+                "architecture": t["architecture"],
+            }
+            for t in _seed_templates[:top_k]
+        ]
+        return fallback
 
-    # Embed the query (join features into a descriptive string)
+    # Embed the query with shared EmbeddingManager
     query_text = ", ".join(features)
-    query_embedding = _model.encode([query_text], convert_to_numpy=True).astype(np.float32)
+    em = get_embedding_manager()
+    query_vec = em.encode(query_text).reshape(1, -1).astype(np.float32)
 
     # Search FAISS
     k = min(top_k, len(_seed_templates))
-    distances, indices = _faiss_index.search(query_embedding, k)
+    distances, indices = _faiss_index.search(query_vec, k)
 
     results = []
     for idx in indices[0]:
@@ -97,6 +161,12 @@ def retrieve_similar(features: list[str], top_k: int = 3) -> list[dict]:
                 "description": template["description"],
                 "architecture": template["architecture"],
             })
+
+    # Cache result
+    with _cache_lock:
+        if len(_query_cache) >= MAX_RAG_CACHE:
+            _query_cache.pop(next(iter(_query_cache)))
+        _query_cache[cache_key] = results
 
     logger.info(f"RAG retrieved {len(results)} similar templates for features: {features}")
     return results

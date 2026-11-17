@@ -12,3 +12,4 @@ pytest
 httpx
 scikit-learn
 numpy
+psutil

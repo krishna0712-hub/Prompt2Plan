@@ -3,9 +3,16 @@ nlp_extraction.py — Step 1: Extract structured requirements from user's projec
 Uses LLM with strict JSON output. Falls back to rule-based keyword extraction.
 """
 import logging
+import threading
+from collections import OrderedDict
 from backend.llm_client import call_llm, parse_json_response
 
 logger = logging.getLogger(__name__)
+
+# In-memory thread-safe LRU cache for requirement extraction results
+_extraction_cache: OrderedDict[str, dict] = OrderedDict()
+_cache_lock = threading.Lock()
+MAX_CACHE_SIZE = 128
 
 # Rule-based fallback keywords for when all LLM providers fail
 DOMAIN_KEYWORDS = {
@@ -76,18 +83,34 @@ async def extract_requirements(idea_text: str) -> dict:
             "domain": str
         }
     """
+    cache_key = idea_text.strip().lower()
+    with _cache_lock:
+        if cache_key in _extraction_cache:
+            _extraction_cache.move_to_end(cache_key)
+            logger.info("NLP extraction served from in-memory cache")
+            return dict(_extraction_cache[cache_key])
+
     # Try LLM extraction first
+    result = None
     try:
         result = await _llm_extract(idea_text)
         if result and _validate_extraction(result):
             logger.info("NLP extraction succeeded via LLM")
-            return result
     except Exception as e:
         logger.warning(f"LLM extraction failed: {e}")
 
     # Fall back to rule-based extraction
-    logger.info("Using rule-based extraction fallback")
-    return _rule_based_extract(idea_text)
+    if not result or not _validate_extraction(result):
+        logger.info("Using rule-based extraction fallback")
+        result = _rule_based_extract(idea_text)
+
+    # Save to cache
+    with _cache_lock:
+        _extraction_cache[cache_key] = result
+        if len(_extraction_cache) > MAX_CACHE_SIZE:
+            _extraction_cache.popitem(last=False)
+
+    return result
 
 
 async def _llm_extract(idea_text: str) -> dict | None:

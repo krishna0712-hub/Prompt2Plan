@@ -1,0 +1,1172 @@
+{
+  "search": [
+    {
+      "query": [
+        "user_auth",
+        "payments",
+        "shopping_cart",
+        "product_listing"
+      ],
+      "results": [
+        {
+          "id": "ecommerce_handmade",
+          "description": "An e-commerce platform for handmade crafts with seller storefronts, product listings, shopping cart, payment processing, order tracking, and review system"
+        },
+        {
+          "id": "booking_system",
+          "description": "A hotel and travel booking system with property listings, availability calendar, reservation management, payments, and guest reviews"
+        },
+        {
+          "id": "fintech_app",
+          "description": "A personal finance management app with bank account linking, transaction categorization, budgeting tools, investment tracking, and financial insights"
+        }
+      ]
+    },
+    {
+      "query": [
+        "chat",
+        "real_time_tracking",
+        "notifications",
+        "user_profiles"
+      ],
+      "results": [
+        {
+          "id": "social_platform",
+          "description": "A social networking platform with user profiles, posts, comments, real-time chat, friend connections, news feed, and content moderation"
+        },
+        {
+          "id": "customer_support",
+          "description": "A customer support platform with ticket management, live chat, knowledge base, AI chatbot, agent dashboard, and customer satisfaction surveys"
+        },
+        {
+          "id": "event_management",
+          "description": "An event management platform with event creation, ticketing, attendee registration, venue management, speaker profiles, and live streaming"
+        }
+      ]
+    },
+    {
+      "query": [
+        "appointments",
+        "doctor",
+        "health",
+        "video_streaming"
+      ],
+      "results": [
+        {
+          "id": "healthcare_telemedicine",
+          "description": "A telemedicine platform with video consultations, appointment scheduling, electronic health records, prescription management, and patient portal"
+        },
+        {
+          "id": "video_conferencing",
+          "description": "A video conferencing platform with multi-party video calls, screen sharing, chat, recording, virtual backgrounds, and meeting scheduling"
+        },
+        {
+          "id": "event_management",
+          "description": "An event management platform with event creation, ticketing, attendee registration, venue management, speaker profiles, and live streaming"
+        }
+      ]
+    },
+    {
+      "query": [
+        "course",
+        "student",
+        "video_streaming",
+        "user_auth"
+      ],
+      "results": [
+        {
+          "id": "learning_platform",
+          "description": "An online learning platform with course management, video lessons, quizzes, progress tracking, certificates, and discussion forums"
+        },
+        {
+          "id": "social_platform",
+          "description": "A social networking platform with user profiles, posts, comments, real-time chat, friend connections, news feed, and content moderation"
+        },
+        {
+          "id": "music_streaming",
+          "description": "A music streaming service with artist profiles, playlist management, audio playback, recommendation engine, social sharing, and offline downloads"
+        }
+      ]
+    },
+    {
+      "query": [
+        "analytics",
+        "admin_dashboard",
+        "metrics",
+        "reports"
+      ],
+      "results": [
+        {
+          "id": "iot_dashboard",
+          "description": "An IoT device management dashboard with real-time sensor data visualization, device provisioning, alert management, firmware updates, and analytics"
+        },
+        {
+          "id": "hr_management",
+          "description": "An HR management system with employee directory, leave management, payroll processing, performance reviews, recruitment pipeline, and org chart"
+        },
+        {
+          "id": "fitness_tracker",
+          "description": "A fitness tracking app with workout logging, meal planning, progress analytics, social challenges, wearable device sync, and personal coaching"
+        }
+      ]
+    },
+    {
+      "query": [
+        "order_tracking",
+        "delivery",
+        "gps",
+        "notifications"
+      ],
+      "results": [
+        {
+          "id": "food_delivery",
+          "description": "A food delivery platform with restaurant listings, menu management, order placement, real-time delivery tracking, driver management, and ratings"
+        },
+        {
+          "id": "inventory_management",
+          "description": "An inventory management system with stock tracking, warehouse management, purchase orders, barcode scanning, reporting, and supplier management"
+        },
+        {
+          "id": "ride_sharing",
+          "description": "A ride-sharing platform with driver matching, real-time GPS tracking, fare calculation, payment processing, trip history, and driver ratings"
+        }
+      ]
+    },
+    {
+      "query": [
+        "reviews",
+        "recommendations",
+        "social_features",
+        "search"
+      ],
+      "results": [
+        {
+          "id": "social_platform",
+          "description": "A social networking platform with user profiles, posts, comments, real-time chat, friend connections, news feed, and content moderation"
+        },
+        {
+          "id": "news_aggregator",
+          "description": "A personalized news aggregation platform with RSS feed parsing, topic categorization, reading list, social sharing, and content recommendation"
+        },
+        {
+          "id": "music_streaming",
+          "description": "A music streaming service with artist profiles, playlist management, audio playback, recommendation engine, social sharing, and offline downloads"
+        }
+      ]
+    },
+    {
+      "query": [
+        "file_upload",
+        "collaboration",
+        "real_time",
+        "user_auth"
+      ],
+      "results": [
+        {
+          "id": "music_streaming",
+          "description": "A music streaming service with artist profiles, playlist management, audio playback, recommendation engine, social sharing, and offline downloads"
+        },
+        {
+          "id": "social_platform",
+          "description": "A social networking platform with user profiles, posts, comments, real-time chat, friend connections, news feed, and content moderation"
+        },
+        {
+          "id": "content_cms",
+          "description": "A headless content management system with rich text editor, media library, content versioning, multi-language support, API-first delivery, and role-based access"
+        }
+      ]
+    },
+    {
+      "query": [
+        "iot",
+        "sensor",
+        "analytics",
+        "real_time_tracking"
+      ],
+      "results": [
+        {
+          "id": "iot_dashboard",
+          "description": "An IoT device management dashboard with real-time sensor data visualization, device provisioning, alert management, firmware updates, and analytics"
+        },
+        {
+          "id": "fitness_tracker",
+          "description": "A fitness tracking app with workout logging, meal planning, progress analytics, social challenges, wearable device sync, and personal coaching"
+        },
+        {
+          "id": "food_delivery",
+          "description": "A food delivery platform with restaurant listings, menu management, order placement, real-time delivery tracking, driver management, and ratings"
+        }
+      ]
+    },
+    {
+      "query": [
+        "finance",
+        "payments",
+        "billing",
+        "analytics"
+      ],
+      "results": [
+        {
+          "id": "fintech_app",
+          "description": "A personal finance management app with bank account linking, transaction categorization, budgeting tools, investment tracking, and financial insights"
+        },
+        {
+          "id": "booking_system",
+          "description": "A hotel and travel booking system with property listings, availability calendar, reservation management, payments, and guest reviews"
+        },
+        {
+          "id": "inventory_management",
+          "description": "An inventory management system with stock tracking, warehouse management, purchase orders, barcode scanning, reporting, and supplier management"
+        }
+      ]
+    }
+  ],
+  "architecture": [
+    {
+      "test_case": {
+        "domain": "e-commerce",
+        "scale": "medium",
+        "project_type": "web_app",
+        "features": [
+          "user_auth",
+          "payments",
+          "shopping_cart",
+          "product_listing",
+          "search"
+        ]
+      },
+      "components_count": 21,
+      "connections_count": 14,
+      "component_ids": [
+        "auth_service",
+        "user_db",
+        "login_ui",
+        "session_manager",
+        "payment_gateway",
+        "transaction_db",
+        "checkout_ui",
+        "billing_service",
+        "cart_service",
+        "cart_ui",
+        "cart_db",
+        "product_service",
+        "catalog_ui",
+        "product_db",
+        "media_storage",
+        "search_service",
+        "search_index",
+        "search_ui",
+        "web_frontend",
+        "api_server",
+        "main_db"
+      ],
+      "connections": [
+        {
+          "from": "login_ui",
+          "to": "auth_service",
+          "label": "Login/Register"
+        },
+        {
+          "from": "auth_service",
+          "to": "user_db",
+          "label": "User lookup"
+        },
+        {
+          "from": "auth_service",
+          "to": "session_manager",
+          "label": "JWT/Session"
+        },
+        {
+          "from": "checkout_ui",
+          "to": "payment_gateway",
+          "label": "Process payment"
+        },
+        {
+          "from": "payment_gateway",
+          "to": "transaction_db",
+          "label": "Record transaction"
+        },
+        {
+          "from": "billing_service",
+          "to": "payment_gateway",
+          "label": "Invoice"
+        },
+        {
+          "from": "cart_ui",
+          "to": "cart_service",
+          "label": "Add/Remove items"
+        },
+        {
+          "from": "cart_service",
+          "to": "cart_db",
+          "label": "Persist cart"
+        },
+        {
+          "from": "catalog_ui",
+          "to": "product_service",
+          "label": "Browse products"
+        },
+        {
+          "from": "product_service",
+          "to": "product_db",
+          "label": "CRUD operations"
+        },
+        {
+          "from": "product_service",
+          "to": "media_storage",
+          "label": "Product images"
+        },
+        {
+          "from": "search_ui",
+          "to": "search_service",
+          "label": "Query"
+        },
+        {
+          "from": "search_service",
+          "to": "search_index",
+          "label": "Full-text search"
+        },
+        {
+          "from": "web_frontend",
+          "to": "api_server",
+          "label": "REST API"
+        }
+      ]
+    },
+    {
+      "test_case": {
+        "domain": "healthcare",
+        "scale": "medium",
+        "project_type": "web_app",
+        "features": [
+          "user_auth",
+          "appointments",
+          "video_streaming",
+          "notifications"
+        ]
+      },
+      "components_count": 20,
+      "connections_count": 14,
+      "component_ids": [
+        "auth_service",
+        "user_db",
+        "login_ui",
+        "session_manager",
+        "appointment_service",
+        "calendar_ui",
+        "availability_service",
+        "appointment_db",
+        "video_service",
+        "transcoding_service",
+        "video_player",
+        "cdn",
+        "video_storage",
+        "notification_service",
+        "email_provider",
+        "push_service",
+        "notification_db",
+        "web_frontend",
+        "api_server",
+        "main_db"
+      ],
+      "connections": [
+        {
+          "from": "login_ui",
+          "to": "auth_service",
+          "label": "Login/Register"
+        },
+        {
+          "from": "auth_service",
+          "to": "user_db",
+          "label": "User lookup"
+        },
+        {
+          "from": "auth_service",
+          "to": "session_manager",
+          "label": "JWT/Session"
+        },
+        {
+          "from": "calendar_ui",
+          "to": "appointment_service",
+          "label": "Book slot"
+        },
+        {
+          "from": "appointment_service",
+          "to": "availability_service",
+          "label": "Check availability"
+        },
+        {
+          "from": "appointment_service",
+          "to": "appointment_db",
+          "label": "Store booking"
+        },
+        {
+          "from": "video_player",
+          "to": "cdn",
+          "label": "Stream video"
+        },
+        {
+          "from": "video_service",
+          "to": "transcoding_service",
+          "label": "Transcode"
+        },
+        {
+          "from": "transcoding_service",
+          "to": "video_storage",
+          "label": "Store segments"
+        },
+        {
+          "from": "video_storage",
+          "to": "cdn",
+          "label": "Distribute"
+        },
+        {
+          "from": "notification_service",
+          "to": "email_provider",
+          "label": "Send email"
+        },
+        {
+          "from": "notification_service",
+          "to": "push_service",
+          "label": "Push notify"
+        },
+        {
+          "from": "notification_service",
+          "to": "notification_db",
+          "label": "Log notifications"
+        },
+        {
+          "from": "web_frontend",
+          "to": "api_server",
+          "label": "REST API"
+        }
+      ]
+    },
+    {
+      "test_case": {
+        "domain": "fintech",
+        "scale": "large",
+        "project_type": "web_app",
+        "features": [
+          "user_auth",
+          "payments",
+          "analytics",
+          "admin_dashboard",
+          "notifications"
+        ]
+      },
+      "components_count": 22,
+      "connections_count": 16,
+      "component_ids": [
+        "auth_service",
+        "user_db",
+        "login_ui",
+        "session_manager",
+        "payment_gateway",
+        "transaction_db",
+        "checkout_ui",
+        "billing_service",
+        "analytics_service",
+        "data_warehouse",
+        "dashboard_ui",
+        "reporting_engine",
+        "admin_ui",
+        "admin_api",
+        "user_management",
+        "notification_service",
+        "email_provider",
+        "push_service",
+        "notification_db",
+        "web_frontend",
+        "api_server",
+        "main_db"
+      ],
+      "connections": [
+        {
+          "from": "login_ui",
+          "to": "auth_service",
+          "label": "Login/Register"
+        },
+        {
+          "from": "auth_service",
+          "to": "user_db",
+          "label": "User lookup"
+        },
+        {
+          "from": "auth_service",
+          "to": "session_manager",
+          "label": "JWT/Session"
+        },
+        {
+          "from": "checkout_ui",
+          "to": "payment_gateway",
+          "label": "Process payment"
+        },
+        {
+          "from": "payment_gateway",
+          "to": "transaction_db",
+          "label": "Record transaction"
+        },
+        {
+          "from": "billing_service",
+          "to": "payment_gateway",
+          "label": "Invoice"
+        },
+        {
+          "from": "dashboard_ui",
+          "to": "analytics_service",
+          "label": "Query metrics"
+        },
+        {
+          "from": "analytics_service",
+          "to": "data_warehouse",
+          "label": "Aggregate data"
+        },
+        {
+          "from": "analytics_service",
+          "to": "reporting_engine",
+          "label": "Generate reports"
+        },
+        {
+          "from": "admin_ui",
+          "to": "admin_api",
+          "label": "Admin operations"
+        },
+        {
+          "from": "admin_api",
+          "to": "analytics_service",
+          "label": "Metrics"
+        },
+        {
+          "from": "admin_api",
+          "to": "user_management",
+          "label": "Manage users"
+        },
+        {
+          "from": "notification_service",
+          "to": "email_provider",
+          "label": "Send email"
+        },
+        {
+          "from": "notification_service",
+          "to": "push_service",
+          "label": "Push notify"
+        },
+        {
+          "from": "notification_service",
+          "to": "notification_db",
+          "label": "Log notifications"
+        },
+        {
+          "from": "web_frontend",
+          "to": "api_server",
+          "label": "REST API"
+        }
+      ]
+    },
+    {
+      "test_case": {
+        "domain": "social",
+        "scale": "large",
+        "project_type": "mobile_app",
+        "features": [
+          "user_auth",
+          "chat",
+          "user_profiles",
+          "social_features",
+          "notifications"
+        ]
+      },
+      "components_count": 22,
+      "connections_count": 16,
+      "component_ids": [
+        "auth_service",
+        "user_db",
+        "login_ui",
+        "session_manager",
+        "chat_service",
+        "websocket_server",
+        "chat_ui",
+        "message_db",
+        "profile_service",
+        "profile_ui",
+        "avatar_storage",
+        "social_service",
+        "feed_service",
+        "social_ui",
+        "social_db",
+        "notification_service",
+        "email_provider",
+        "push_service",
+        "notification_db",
+        "web_frontend",
+        "api_server",
+        "main_db"
+      ],
+      "connections": [
+        {
+          "from": "login_ui",
+          "to": "auth_service",
+          "label": "Login/Register"
+        },
+        {
+          "from": "auth_service",
+          "to": "user_db",
+          "label": "User lookup"
+        },
+        {
+          "from": "auth_service",
+          "to": "session_manager",
+          "label": "JWT/Session"
+        },
+        {
+          "from": "chat_ui",
+          "to": "websocket_server",
+          "label": "Real-time messages"
+        },
+        {
+          "from": "websocket_server",
+          "to": "chat_service",
+          "label": "Message handling"
+        },
+        {
+          "from": "chat_service",
+          "to": "message_db",
+          "label": "Persist messages"
+        },
+        {
+          "from": "profile_ui",
+          "to": "profile_service",
+          "label": "View/Edit profile"
+        },
+        {
+          "from": "profile_service",
+          "to": "user_db",
+          "label": "Read/Write"
+        },
+        {
+          "from": "profile_service",
+          "to": "avatar_storage",
+          "label": "Store avatar"
+        },
+        {
+          "from": "social_ui",
+          "to": "social_service",
+          "label": "Follow/Like/Share"
+        },
+        {
+          "from": "social_service",
+          "to": "feed_service",
+          "label": "Update feed"
+        },
+        {
+          "from": "social_service",
+          "to": "social_db",
+          "label": "Social graph"
+        },
+        {
+          "from": "notification_service",
+          "to": "email_provider",
+          "label": "Send email"
+        },
+        {
+          "from": "notification_service",
+          "to": "push_service",
+          "label": "Push notify"
+        },
+        {
+          "from": "notification_service",
+          "to": "notification_db",
+          "label": "Log notifications"
+        },
+        {
+          "from": "web_frontend",
+          "to": "api_server",
+          "label": "REST API"
+        }
+      ]
+    },
+    {
+      "test_case": {
+        "domain": "logistics",
+        "scale": "small",
+        "project_type": "web_app",
+        "features": [
+          "user_auth",
+          "real_time_tracking",
+          "order_tracking",
+          "notifications"
+        ]
+      },
+      "components_count": 19,
+      "connections_count": 13,
+      "component_ids": [
+        "auth_service",
+        "user_db",
+        "login_ui",
+        "session_manager",
+        "tracking_service",
+        "location_service",
+        "map_ui",
+        "websocket_server",
+        "order_service",
+        "shipping_service",
+        "order_ui",
+        "order_db",
+        "notification_service",
+        "email_provider",
+        "push_service",
+        "notification_db",
+        "web_frontend",
+        "api_server",
+        "main_db"
+      ],
+      "connections": [
+        {
+          "from": "login_ui",
+          "to": "auth_service",
+          "label": "Login/Register"
+        },
+        {
+          "from": "auth_service",
+          "to": "user_db",
+          "label": "User lookup"
+        },
+        {
+          "from": "auth_service",
+          "to": "session_manager",
+          "label": "JWT/Session"
+        },
+        {
+          "from": "location_service",
+          "to": "tracking_service",
+          "label": "GPS data"
+        },
+        {
+          "from": "tracking_service",
+          "to": "websocket_server",
+          "label": "Push updates"
+        },
+        {
+          "from": "websocket_server",
+          "to": "map_ui",
+          "label": "Live position"
+        },
+        {
+          "from": "order_ui",
+          "to": "order_service",
+          "label": "Track order"
+        },
+        {
+          "from": "order_service",
+          "to": "shipping_service",
+          "label": "Shipment status"
+        },
+        {
+          "from": "order_service",
+          "to": "order_db",
+          "label": "Read/Write"
+        },
+        {
+          "from": "notification_service",
+          "to": "email_provider",
+          "label": "Send email"
+        },
+        {
+          "from": "notification_service",
+          "to": "push_service",
+          "label": "Push notify"
+        },
+        {
+          "from": "notification_service",
+          "to": "notification_db",
+          "label": "Log notifications"
+        },
+        {
+          "from": "web_frontend",
+          "to": "api_server",
+          "label": "REST API"
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "case_idx": 0,
+      "total_estimated_hours": 78.8,
+      "task_hours": [
+        {
+          "name": "Setup PostgreSQL database schema and migrations",
+          "estimated_hours": 10.0,
+          "optimistic_hours": 6.0,
+          "pessimistic_hours": 16.1
+        },
+        {
+          "name": "Implement user authentication with JWT and refresh tokens",
+          "estimated_hours": 15.8,
+          "optimistic_hours": 8.5,
+          "pessimistic_hours": 21.8
+        },
+        {
+          "name": "Build responsive React checkout flow and cart UI",
+          "estimated_hours": 15.0,
+          "optimistic_hours": 6.4,
+          "pessimistic_hours": 21.8
+        },
+        {
+          "name": "Integrate Stripe payment intent webhook processor",
+          "estimated_hours": 23.6,
+          "optimistic_hours": 11.9,
+          "pessimistic_hours": 43.7
+        },
+        {
+          "name": "Write automated end-to-end integration test suite",
+          "estimated_hours": 14.4,
+          "optimistic_hours": 10.6,
+          "pessimistic_hours": 19.4
+        }
+      ],
+      "milestones": [
+        {
+          "phase_name": "Setup",
+          "start_day": 1,
+          "end_day": 2,
+          "total_hours": 10.0,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Core Development",
+          "start_day": 3,
+          "end_day": 11,
+          "total_hours": 54.4,
+          "total_days": 9
+        },
+        {
+          "phase_name": "Testing",
+          "start_day": 12,
+          "end_day": 13,
+          "total_hours": 14.4,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Deployment",
+          "start_day": 14,
+          "end_day": 15,
+          "total_hours": 11.0,
+          "total_days": 2
+        }
+      ]
+    },
+    {
+      "case_idx": 1,
+      "total_estimated_hours": 91.5,
+      "task_hours": [
+        {
+          "name": "Configure Redis cluster and pub-sub channels",
+          "estimated_hours": 12.3,
+          "optimistic_hours": 6.0,
+          "pessimistic_hours": 27.6
+        },
+        {
+          "name": "Build WebSocket real-time messaging gateway",
+          "estimated_hours": 25.4,
+          "optimistic_hours": 17.8,
+          "pessimistic_hours": 34.3
+        },
+        {
+          "name": "Implement user direct message chat screen in React",
+          "estimated_hours": 15.8,
+          "optimistic_hours": 8.5,
+          "pessimistic_hours": 29.9
+        },
+        {
+          "name": "Add push notification dispatch for offline users",
+          "estimated_hours": 17.1,
+          "optimistic_hours": 8.5,
+          "pessimistic_hours": 33.9
+        },
+        {
+          "name": "Perform load testing for 10k concurrent connections",
+          "estimated_hours": 20.9,
+          "optimistic_hours": 10.6,
+          "pessimistic_hours": 28.2
+        }
+      ],
+      "milestones": [
+        {
+          "phase_name": "Setup",
+          "start_day": 1,
+          "end_day": 2,
+          "total_hours": 12.3,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Core Development",
+          "start_day": 3,
+          "end_day": 12,
+          "total_hours": 58.3,
+          "total_days": 10
+        },
+        {
+          "phase_name": "Testing",
+          "start_day": 13,
+          "end_day": 15,
+          "total_hours": 20.9,
+          "total_days": 3
+        },
+        {
+          "phase_name": "Deployment",
+          "start_day": 16,
+          "end_day": 17,
+          "total_hours": 11.0,
+          "total_days": 2
+        }
+      ]
+    },
+    {
+      "case_idx": 2,
+      "total_estimated_hours": 81.1,
+      "task_hours": [
+        {
+          "name": "Design HIPAA compliant encrypted patient record store",
+          "estimated_hours": 18.2,
+          "optimistic_hours": 8.9,
+          "pessimistic_hours": 43.7
+        },
+        {
+          "name": "Develop appointment scheduling REST API endpoints",
+          "estimated_hours": 17.6,
+          "optimistic_hours": 8.9,
+          "pessimistic_hours": 24.7
+        },
+        {
+          "name": "Build doctor availability calendar booking component",
+          "estimated_hours": 12.8,
+          "optimistic_hours": 6.8,
+          "pessimistic_hours": 24.1
+        },
+        {
+          "name": "Integrate Twilio video WebRTC consultation room",
+          "estimated_hours": 19.7,
+          "optimistic_hours": 11.9,
+          "pessimistic_hours": 32.2
+        },
+        {
+          "name": "Security audit and vulnerability penetration test",
+          "estimated_hours": 12.8,
+          "optimistic_hours": 8.1,
+          "pessimistic_hours": 18.4
+        }
+      ],
+      "milestones": [
+        {
+          "phase_name": "Setup",
+          "start_day": 1,
+          "end_day": 3,
+          "total_hours": 18.2,
+          "total_days": 3
+        },
+        {
+          "phase_name": "Core Development",
+          "start_day": 4,
+          "end_day": 11,
+          "total_hours": 50.1,
+          "total_days": 8
+        },
+        {
+          "phase_name": "Testing",
+          "start_day": 12,
+          "end_day": 13,
+          "total_hours": 12.8,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Deployment",
+          "start_day": 14,
+          "end_day": 15,
+          "total_hours": 11.0,
+          "total_days": 2
+        }
+      ]
+    },
+    {
+      "case_idx": 3,
+      "total_estimated_hours": 90.1,
+      "task_hours": [
+        {
+          "name": "Setup time-series database for IoT sensor ingestion",
+          "estimated_hours": 15.6,
+          "optimistic_hours": 8.9,
+          "pessimistic_hours": 22.4
+        },
+        {
+          "name": "Build streaming telemetry data processor pipeline",
+          "estimated_hours": 22.0,
+          "optimistic_hours": 11.9,
+          "pessimistic_hours": 32.2
+        },
+        {
+          "name": "Create real-time device health telemetry dashboard",
+          "estimated_hours": 14.0,
+          "optimistic_hours": 9.3,
+          "pessimistic_hours": 24.1
+        },
+        {
+          "name": "MQTT broker hardware device bridge integration",
+          "estimated_hours": 21.5,
+          "optimistic_hours": 11.9,
+          "pessimistic_hours": 33.9
+        },
+        {
+          "name": "Simulated hardware sensor failure testing",
+          "estimated_hours": 17.0,
+          "optimistic_hours": 8.1,
+          "pessimistic_hours": 23.0
+        }
+      ],
+      "milestones": [
+        {
+          "phase_name": "Setup",
+          "start_day": 1,
+          "end_day": 3,
+          "total_hours": 15.6,
+          "total_days": 3
+        },
+        {
+          "phase_name": "Core Development",
+          "start_day": 4,
+          "end_day": 13,
+          "total_hours": 57.5,
+          "total_days": 10
+        },
+        {
+          "phase_name": "Testing",
+          "start_day": 14,
+          "end_day": 16,
+          "total_hours": 17.0,
+          "total_days": 3
+        },
+        {
+          "phase_name": "Deployment",
+          "start_day": 17,
+          "end_day": 18,
+          "total_hours": 11.0,
+          "total_days": 2
+        }
+      ]
+    },
+    {
+      "case_idx": 4,
+      "total_estimated_hours": 82.2,
+      "task_hours": [
+        {
+          "name": "Initialize Docker containers and CI/CD pipeline",
+          "estimated_hours": 9.2,
+          "optimistic_hours": 6.0,
+          "pessimistic_hours": 12.4
+        },
+        {
+          "name": "Implement multi-tenant ledger and transaction engine",
+          "estimated_hours": 20.1,
+          "optimistic_hours": 8.9,
+          "pessimistic_hours": 43.7
+        },
+        {
+          "name": "Build executive financial analytics charts and metrics",
+          "estimated_hours": 16.5,
+          "optimistic_hours": 9.3,
+          "pessimistic_hours": 24.1
+        },
+        {
+          "name": "Connect Plaid banking verification API provider",
+          "estimated_hours": 22.7,
+          "optimistic_hours": 11.0,
+          "pessimistic_hours": 43.7
+        },
+        {
+          "name": "Execute financial reconciliation test validation",
+          "estimated_hours": 13.7,
+          "optimistic_hours": 9.8,
+          "pessimistic_hours": 19.0
+        }
+      ],
+      "milestones": [
+        {
+          "phase_name": "Setup",
+          "start_day": 1,
+          "end_day": 2,
+          "total_hours": 9.2,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Core Development",
+          "start_day": 3,
+          "end_day": 12,
+          "total_hours": 59.3,
+          "total_days": 10
+        },
+        {
+          "phase_name": "Testing",
+          "start_day": 13,
+          "end_day": 14,
+          "total_hours": 13.7,
+          "total_days": 2
+        },
+        {
+          "phase_name": "Deployment",
+          "start_day": 15,
+          "end_day": 16,
+          "total_hours": 11.0,
+          "total_days": 2
+        }
+      ]
+    }
+  ],
+  "breakdown": [
+    {
+      "component_id": "web_frontend",
+      "tasks": [
+        "Set up React/Next.js project structure",
+        "Design and implement responsive layouts",
+        "Build navigation and routing",
+        "Implement state management"
+      ]
+    },
+    {
+      "component_id": "auth_service",
+      "tasks": [
+        "Implement user registration and login",
+        "Set up JWT token generation and validation",
+        "Add password hashing and reset flow",
+        "Implement role-based access control"
+      ]
+    },
+    {
+      "component_id": "payment_gateway",
+      "tasks": [
+        "Integrate payment provider API (Stripe/PayPal)",
+        "Build checkout flow UI",
+        "Handle failed transactions and retries",
+        "Implement refund and dispute logic"
+      ]
+    },
+    {
+      "component_id": "search_service",
+      "tasks": [
+        "Set up full-text search index",
+        "Implement search query parser",
+        "Add filters and faceted search",
+        "Optimize search performance and relevance"
+      ]
+    },
+    {
+      "component_id": "analytics_dashboard",
+      "tasks": [
+        "Design dashboard layout with widgets",
+        "Implement chart and graph components",
+        "Add real-time data refresh",
+        "Build customizable dashboard views"
+      ]
+    }
+  ]
+}

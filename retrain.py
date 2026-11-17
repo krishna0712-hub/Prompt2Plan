@@ -72,7 +72,7 @@ def retrain_model():
                 next_id += 1
 
     logger.info("Retraining AI effort estimation model on updated dataset...")
-    initialize_estimator()
+    initialize_estimator(force_recompute=True)
 
     metrics = get_model_metrics()
     logger.info(f"✅ Retraining complete! Updated Metrics -> MMRE: {metrics.get('mmre')}, PRED(25): {metrics.get('pred_25')}%")

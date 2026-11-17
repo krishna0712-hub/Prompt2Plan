@@ -3,6 +3,7 @@ main.py — FastAPI application for Prompt2Plan
 Serves both the REST API and the built React frontend from one process on port 8000.
 """
 import os
+import gc
 import json
 import logging
 from contextlib import asynccontextmanager
@@ -23,6 +24,7 @@ from backend.ai_effort_estimator import estimate_effort, initialize_estimator, g
 from backend.milestone_scheduler import schedule_milestones
 from backend.cost_estimation import estimate_cloud_costs, analyze_project_risks
 from backend.exporter import generate_jira_csv, generate_github_csv, generate_html_report
+from backend.embedding_manager import get_embedding_manager
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -36,15 +38,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-import asyncio
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Sequential, lightweight initialization of database, knowledge graph, and indexes."""
+    logger.info("🚀 Initializing Prompt2Plan backend...")
 
-def _async_init_bg():
+    # 1. Database initialization (lightweight SQLite tables)
     try:
-        initialize_rag()
-        logger.info("✓ RAG index built")
+        init_db()
+        logger.info("✓ Database initialized")
     except Exception as e:
-        logger.error(f"✗ RAG initialization failed: {e}")
+        logger.error(f"✗ Database initialization failed: {e}")
 
+    # 2. Sequential lightweight module setup (loads precomputed indexes without model bloat)
     try:
         initialize_kg()
         logger.info("✓ Knowledge graph loaded")
@@ -52,29 +58,21 @@ def _async_init_bg():
         logger.error(f"✗ Knowledge graph loading failed: {e}")
 
     try:
+        initialize_rag()
+        logger.info("✓ RAG index ready (precomputed embeddings loaded)")
+    except Exception as e:
+        logger.error(f"✗ RAG initialization failed: {e}")
+
+    try:
         initialize_estimator()
-        logger.info("✓ AI Effort Estimator trained & ready")
+        logger.info("✓ AI Effort Estimator ready (historical dataset loaded)")
     except Exception as e:
         logger.error(f"✗ AI Effort Estimator initialization failed: {e}")
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Initialize database and trigger RAG/KG initialization in background."""
-    logger.info("🚀 Initializing Prompt2Plan...")
-
-    # 1. Create database tables
-    init_db()
-    logger.info("✓ Database initialized")
-
-    # 2. Trigger RAG & Knowledge Graph load in background thread so server starts instantly
-    asyncio.create_task(asyncio.to_thread(_async_init_bg))
-
-    logger.info("🎯 Prompt2Plan server listening on http://localhost:8000")
+    logger.info("🎯 Prompt2Plan server listening on port 8000")
     yield
     logger.info("👋 Shutting down Prompt2Plan...")
-
-    logger.info("👋 Shutting down Prompt2Plan...")
+    gc.collect()
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -136,6 +134,26 @@ class TaskActualHoursRequest(BaseModel):
 # ────────────────────────────────────────────────────────────────────────────
 #  API Endpoints
 # ────────────────────────────────────────────────────────────────────────────
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint reporting process memory and embedding manager status."""
+    mem_mb = None
+    try:
+        import psutil
+        mem_mb = round(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024), 2)
+    except Exception:
+        pass
+
+    em = get_embedding_manager()
+    stats = em.get_stats()
+
+    return JSONResponse(content={
+        "status": "healthy",
+        "memory_rss_mb": mem_mb,
+        "embedding_manager": stats,
+    })
+
 
 @app.post("/api/generate-plan")
 async def generate_plan(request: GeneratePlanRequest):
@@ -201,6 +219,8 @@ async def generate_plan(request: GeneratePlanRequest):
             status_code=500,
             detail=f"Failed to generate plan: {str(e)}. Please try again."
         )
+    finally:
+        gc.collect()
 
 
 @app.get("/api/projects")

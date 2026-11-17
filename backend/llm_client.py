@@ -50,10 +50,14 @@ def _get_hf_client():
     if _hf_client is not None:
         return _hf_client
 
+    token = os.environ.get("HF_TOKEN", "")
+    if not token or token == "your_hf_token_here":
+        logger.warning("HF_TOKEN not set — Hugging Face calls will be skipped")
+        return None
+
     try:
         from huggingface_hub import InferenceClient
-        token = os.environ.get("HF_TOKEN", None)
-        _hf_client = InferenceClient(token=token if token else None)
+        _hf_client = InferenceClient(token=token, timeout=15)
         logger.info("Hugging Face Inference client initialized")
         return _hf_client
     except Exception as e:

@@ -59,6 +59,7 @@ def start_server():
         host="0.0.0.0",
         port=port,
         reload=False,
+        workers=1,
         log_level="info",
     )
 
